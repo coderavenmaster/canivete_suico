@@ -1,0 +1,2356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://www.scalaseguros.com.br/storage/app/uploads/public/5eb/eaf/184/5ebeaf1848286440445874.ico">
+    <title>Tabela de Prazo Curto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            font-size: 13px;
+            margin: 5px;
+            background-color: #e8e8e8;
+        }
+
+        .top-bar {
+            background-color: white;
+            padding: 8px 15px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar-left {
+            color: #3d7399;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .top-bar-right {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .main-content {
+            background-color: white;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .tabs-ramos {
+            display: flex;
+            gap: 5px;
+            margin: 10px 20px 0 20px;
+        }
+        
+        .tab-ramo {
+            padding: 6px 14px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-ramo.active {
+            background-color: #4a6675;
+            color: white;
+            border-color: #3d5560;
+        }
+        
+        .tab-ramo:hover {
+            background-color: #e6e6e6;
+        }
+
+        .form-section {
+            margin: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .form-section.fechado .form-content {
+            display: none;
+        }
+
+        .header-section {
+            background-color: #4a6675;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #3d5560;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .header-icon {
+            transition: transform 0.2s ease;
+            font-size: 13px;
+        }
+
+        .form-section.fechado .header-icon {
+            transform: rotate(-90deg);
+        }
+
+        .form-content {
+            background-color: white;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"] {
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            background-color: white;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #66afe9;
+            box-shadow: 0 0 3px rgba(102, 175, 233, 0.5);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 7px 20px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #f5f5f5;
+        }
+
+        .btn-processar {
+            background-color: #5bc0de;
+            color: white;
+            border-color: #5bc0de;
+        }
+
+        .btn-processar:hover:not(:disabled) {
+            background-color: #46b8da;
+        }
+
+        .btn-limpar {
+            background-color: #d9534f;
+            color: white;
+            border-color: #d9534f;
+        }
+
+        .btn-limpar:hover {
+            background-color: #c9302c;
+        }
+
+        .btn-tabela {
+            background-color: #f0ad4e;
+            color: white;
+            border-color: #f0ad4e;
+        }
+
+        .btn-tabela:hover {
+            background-color: #ec971f;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            margin: 20px;
+            padding: 0;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-header {
+            background-color: #4a6675;
+            color: white;
+            padding: 10px 15px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-right: none;
+        }
+
+        .result-item label {
+            font-weight: bold;
+            color: #666;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .result-item .value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background-color: #4a6675;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .close {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #ccc;
+        }
+
+        .modal-body {
+            padding: 15px;
+            overflow-y: auto;
+            max-height: calc(80vh - 60px);
+        }
+
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .reference-table th,
+        .reference-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .reference-table th {
+            background-color: #4a6675;
+            color: white;
+            font-weight: bold;
+        }
+
+        .reference-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .reference-table tr:hover {
+            background-color: #f0f8ff;
+        }
+
+        .alert {
+            padding: 10px 12px;
+            margin: 15px 20px;
+            border-left: 4px solid;
+            font-size: 12px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert.error {
+            background-color: #f2dede;
+            border-color: #d9534f;
+            color: #a94442;
+        }
+
+        @media (max-width: 1024px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-item {
+                border-right: none;
+            }
+
+            .tabs-ramos {
+                flex-wrap: wrap;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <script>
+        // Tabela de referência
+        const tabelaReferencia = [
+                {
+                    "dias": 0,
+                    "percentual": 0.0
+                },
+                {
+                    "dias": 1,
+                    "percentual": 0.87
+                },
+                {
+                    "dias": 2,
+                    "percentual": 1.73
+                },
+                {
+                    "dias": 3,
+                    "percentual": 2.6
+                },
+                {
+                    "dias": 4,
+                    "percentual": 3.47
+                },
+                {
+                    "dias": 5,
+                    "percentual": 4.33
+                },
+                {
+                    "dias": 6,
+                    "percentual": 5.2
+                },
+                {
+                    "dias": 7,
+                    "percentual": 6.07
+                },
+                {
+                    "dias": 8,
+                    "percentual": 6.93
+                },
+                {
+                    "dias": 9,
+                    "percentual": 7.8
+                },
+                {
+                    "dias": 10,
+                    "percentual": 8.67
+                },
+                {
+                    "dias": 11,
+                    "percentual": 9.53
+                },
+                {
+                    "dias": 12,
+                    "percentual": 10.4
+                },
+                {
+                    "dias": 13,
+                    "percentual": 11.27
+                },
+                {
+                    "dias": 14,
+                    "percentual": 12.13
+                },
+                {
+                    "dias": 15,
+                    "percentual": 13.0
+                },
+                {
+                    "dias": 16,
+                    "percentual": 13.47
+                },
+                {
+                    "dias": 17,
+                    "percentual": 13.93
+                },
+                {
+                    "dias": 18,
+                    "percentual": 14.4
+                },
+                {
+                    "dias": 19,
+                    "percentual": 14.87
+                },
+                {
+                    "dias": 20,
+                    "percentual": 15.33
+                },
+                {
+                    "dias": 21,
+                    "percentual": 15.8
+                },
+                {
+                    "dias": 22,
+                    "percentual": 16.27
+                },
+                {
+                    "dias": 23,
+                    "percentual": 16.73
+                },
+                {
+                    "dias": 24,
+                    "percentual": 17.2
+                },
+                {
+                    "dias": 25,
+                    "percentual": 17.67
+                },
+                {
+                    "dias": 26,
+                    "percentual": 18.13
+                },
+                {
+                    "dias": 27,
+                    "percentual": 18.6
+                },
+                {
+                    "dias": 28,
+                    "percentual": 19.07
+                },
+                {
+                    "dias": 29,
+                    "percentual": 19.53
+                },
+                {
+                    "dias": 30,
+                    "percentual": 20.0
+                },
+                {
+                    "dias": 31,
+                    "percentual": 20.47
+                },
+                {
+                    "dias": 32,
+                    "percentual": 20.93
+                },
+                {
+                    "dias": 33,
+                    "percentual": 21.4
+                },
+                {
+                    "dias": 34,
+                    "percentual": 21.87
+                },
+                {
+                    "dias": 35,
+                    "percentual": 22.33
+                },
+                {
+                    "dias": 36,
+                    "percentual": 22.8
+                },
+                {
+                    "dias": 37,
+                    "percentual": 23.27
+                },
+                {
+                    "dias": 38,
+                    "percentual": 23.73
+                },
+                {
+                    "dias": 39,
+                    "percentual": 24.2
+                },
+                {
+                    "dias": 40,
+                    "percentual": 24.67
+                },
+                {
+                    "dias": 41,
+                    "percentual": 25.13
+                },
+                {
+                    "dias": 42,
+                    "percentual": 25.6
+                },
+                {
+                    "dias": 43,
+                    "percentual": 26.07
+                },
+                {
+                    "dias": 44,
+                    "percentual": 26.53
+                },
+                {
+                    "dias": 45,
+                    "percentual": 27.0
+                },
+                {
+                    "dias": 46,
+                    "percentual": 27.2
+                },
+                {
+                    "dias": 47,
+                    "percentual": 27.4
+                },
+                {
+                    "dias": 48,
+                    "percentual": 27.6
+                },
+                {
+                    "dias": 49,
+                    "percentual": 27.8
+                },
+                {
+                    "dias": 50,
+                    "percentual": 28.0
+                },
+                {
+                    "dias": 51,
+                    "percentual": 28.2
+                },
+                {
+                    "dias": 52,
+                    "percentual": 28.4
+                },
+                {
+                    "dias": 53,
+                    "percentual": 28.6
+                },
+                {
+                    "dias": 54,
+                    "percentual": 28.8
+                },
+                {
+                    "dias": 55,
+                    "percentual": 29.0
+                },
+                {
+                    "dias": 56,
+                    "percentual": 29.2
+                },
+                {
+                    "dias": 57,
+                    "percentual": 29.4
+                },
+                {
+                    "dias": 58,
+                    "percentual": 29.6
+                },
+                {
+                    "dias": 59,
+                    "percentual": 29.8
+                },
+                {
+                    "dias": 60,
+                    "percentual": 30.0
+                },
+                {
+                    "dias": 61,
+                    "percentual": 30.47
+                },
+                {
+                    "dias": 62,
+                    "percentual": 30.93
+                },
+                {
+                    "dias": 63,
+                    "percentual": 31.4
+                },
+                {
+                    "dias": 64,
+                    "percentual": 31.87
+                },
+                {
+                    "dias": 65,
+                    "percentual": 32.33
+                },
+                {
+                    "dias": 66,
+                    "percentual": 32.8
+                },
+                {
+                    "dias": 67,
+                    "percentual": 33.27
+                },
+                {
+                    "dias": 68,
+                    "percentual": 33.73
+                },
+                {
+                    "dias": 69,
+                    "percentual": 34.2
+                },
+                {
+                    "dias": 70,
+                    "percentual": 34.67
+                },
+                {
+                    "dias": 71,
+                    "percentual": 35.13
+                },
+                {
+                    "dias": 72,
+                    "percentual": 35.6
+                },
+                {
+                    "dias": 73,
+                    "percentual": 36.07
+                },
+                {
+                    "dias": 74,
+                    "percentual": 36.53
+                },
+                {
+                    "dias": 75,
+                    "percentual": 37.0
+                },
+                {
+                    "dias": 76,
+                    "percentual": 37.2
+                },
+                {
+                    "dias": 77,
+                    "percentual": 37.4
+                },
+                {
+                    "dias": 78,
+                    "percentual": 37.6
+                },
+                {
+                    "dias": 79,
+                    "percentual": 37.8
+                },
+                {
+                    "dias": 80,
+                    "percentual": 38.0
+                },
+                {
+                    "dias": 81,
+                    "percentual": 38.2
+                },
+                {
+                    "dias": 82,
+                    "percentual": 38.4
+                },
+                {
+                    "dias": 83,
+                    "percentual": 38.6
+                },
+                {
+                    "dias": 84,
+                    "percentual": 38.8
+                },
+                {
+                    "dias": 85,
+                    "percentual": 39.0
+                },
+                {
+                    "dias": 86,
+                    "percentual": 39.2
+                },
+                {
+                    "dias": 87,
+                    "percentual": 39.4
+                },
+                {
+                    "dias": 88,
+                    "percentual": 39.6
+                },
+                {
+                    "dias": 89,
+                    "percentual": 39.8
+                },
+                {
+                    "dias": 90,
+                    "percentual": 40.0
+                },
+                {
+                    "dias": 91,
+                    "percentual": 40.4
+                },
+                {
+                    "dias": 92,
+                    "percentual": 40.8
+                },
+                {
+                    "dias": 93,
+                    "percentual": 41.2
+                },
+                {
+                    "dias": 94,
+                    "percentual": 41.6
+                },
+                {
+                    "dias": 95,
+                    "percentual": 42.0
+                },
+                {
+                    "dias": 96,
+                    "percentual": 42.4
+                },
+                {
+                    "dias": 97,
+                    "percentual": 42.8
+                },
+                {
+                    "dias": 98,
+                    "percentual": 43.2
+                },
+                {
+                    "dias": 99,
+                    "percentual": 43.6
+                },
+                {
+                    "dias": 100,
+                    "percentual": 44.0
+                },
+                {
+                    "dias": 101,
+                    "percentual": 44.4
+                },
+                {
+                    "dias": 102,
+                    "percentual": 44.8
+                },
+                {
+                    "dias": 103,
+                    "percentual": 45.2
+                },
+                {
+                    "dias": 104,
+                    "percentual": 45.6
+                },
+                {
+                    "dias": 105,
+                    "percentual": 46.0
+                },
+                {
+                    "dias": 106,
+                    "percentual": 46.27
+                },
+                {
+                    "dias": 107,
+                    "percentual": 46.53
+                },
+                {
+                    "dias": 108,
+                    "percentual": 46.8
+                },
+                {
+                    "dias": 109,
+                    "percentual": 47.07
+                },
+                {
+                    "dias": 110,
+                    "percentual": 47.33
+                },
+                {
+                    "dias": 111,
+                    "percentual": 47.6
+                },
+                {
+                    "dias": 112,
+                    "percentual": 47.87
+                },
+                {
+                    "dias": 113,
+                    "percentual": 48.13
+                },
+                {
+                    "dias": 114,
+                    "percentual": 48.4
+                },
+                {
+                    "dias": 115,
+                    "percentual": 48.67
+                },
+                {
+                    "dias": 116,
+                    "percentual": 48.93
+                },
+                {
+                    "dias": 117,
+                    "percentual": 49.2
+                },
+                {
+                    "dias": 118,
+                    "percentual": 49.47
+                },
+                {
+                    "dias": 119,
+                    "percentual": 49.73
+                },
+                {
+                    "dias": 120,
+                    "percentual": 50.0
+                },
+                {
+                    "dias": 121,
+                    "percentual": 50.4
+                },
+                {
+                    "dias": 122,
+                    "percentual": 50.8
+                },
+                {
+                    "dias": 123,
+                    "percentual": 51.2
+                },
+                {
+                    "dias": 124,
+                    "percentual": 51.6
+                },
+                {
+                    "dias": 125,
+                    "percentual": 52.0
+                },
+                {
+                    "dias": 126,
+                    "percentual": 52.4
+                },
+                {
+                    "dias": 127,
+                    "percentual": 52.8
+                },
+                {
+                    "dias": 128,
+                    "percentual": 53.2
+                },
+                {
+                    "dias": 129,
+                    "percentual": 53.6
+                },
+                {
+                    "dias": 130,
+                    "percentual": 54.0
+                },
+                {
+                    "dias": 131,
+                    "percentual": 54.4
+                },
+                {
+                    "dias": 132,
+                    "percentual": 54.8
+                },
+                {
+                    "dias": 133,
+                    "percentual": 55.2
+                },
+                {
+                    "dias": 134,
+                    "percentual": 55.6
+                },
+                {
+                    "dias": 135,
+                    "percentual": 56.0
+                },
+                {
+                    "dias": 136,
+                    "percentual": 56.27
+                },
+                {
+                    "dias": 137,
+                    "percentual": 56.53
+                },
+                {
+                    "dias": 138,
+                    "percentual": 56.8
+                },
+                {
+                    "dias": 139,
+                    "percentual": 57.07
+                },
+                {
+                    "dias": 140,
+                    "percentual": 57.33
+                },
+                {
+                    "dias": 141,
+                    "percentual": 57.6
+                },
+                {
+                    "dias": 142,
+                    "percentual": 57.87
+                },
+                {
+                    "dias": 143,
+                    "percentual": 58.13
+                },
+                {
+                    "dias": 144,
+                    "percentual": 58.4
+                },
+                {
+                    "dias": 145,
+                    "percentual": 58.67
+                },
+                {
+                    "dias": 146,
+                    "percentual": 58.93
+                },
+                {
+                    "dias": 147,
+                    "percentual": 59.2
+                },
+                {
+                    "dias": 148,
+                    "percentual": 59.47
+                },
+                {
+                    "dias": 149,
+                    "percentual": 59.73
+                },
+                {
+                    "dias": 150,
+                    "percentual": 60.0
+                },
+                {
+                    "dias": 151,
+                    "percentual": 60.4
+                },
+                {
+                    "dias": 152,
+                    "percentual": 60.8
+                },
+                {
+                    "dias": 153,
+                    "percentual": 61.2
+                },
+                {
+                    "dias": 154,
+                    "percentual": 61.6
+                },
+                {
+                    "dias": 155,
+                    "percentual": 62.0
+                },
+                {
+                    "dias": 156,
+                    "percentual": 62.4
+                },
+                {
+                    "dias": 157,
+                    "percentual": 62.8
+                },
+                {
+                    "dias": 158,
+                    "percentual": 63.2
+                },
+                {
+                    "dias": 159,
+                    "percentual": 63.6
+                },
+                {
+                    "dias": 160,
+                    "percentual": 64.0
+                },
+                {
+                    "dias": 161,
+                    "percentual": 64.4
+                },
+                {
+                    "dias": 162,
+                    "percentual": 64.8
+                },
+                {
+                    "dias": 163,
+                    "percentual": 65.2
+                },
+                {
+                    "dias": 164,
+                    "percentual": 65.6
+                },
+                {
+                    "dias": 165,
+                    "percentual": 66.0
+                },
+                {
+                    "dias": 166,
+                    "percentual": 66.27
+                },
+                {
+                    "dias": 167,
+                    "percentual": 66.53
+                },
+                {
+                    "dias": 168,
+                    "percentual": 66.8
+                },
+                {
+                    "dias": 169,
+                    "percentual": 67.07
+                },
+                {
+                    "dias": 170,
+                    "percentual": 67.33
+                },
+                {
+                    "dias": 171,
+                    "percentual": 67.6
+                },
+                {
+                    "dias": 172,
+                    "percentual": 67.87
+                },
+                {
+                    "dias": 173,
+                    "percentual": 68.13
+                },
+                {
+                    "dias": 174,
+                    "percentual": 68.4
+                },
+                {
+                    "dias": 175,
+                    "percentual": 68.67
+                },
+                {
+                    "dias": 176,
+                    "percentual": 68.93
+                },
+                {
+                    "dias": 177,
+                    "percentual": 69.2
+                },
+                {
+                    "dias": 178,
+                    "percentual": 69.47
+                },
+                {
+                    "dias": 179,
+                    "percentual": 69.73
+                },
+                {
+                    "dias": 180,
+                    "percentual": 70.0
+                },
+                {
+                    "dias": 181,
+                    "percentual": 70.2
+                },
+                {
+                    "dias": 182,
+                    "percentual": 70.4
+                },
+                {
+                    "dias": 183,
+                    "percentual": 70.6
+                },
+                {
+                    "dias": 184,
+                    "percentual": 70.8
+                },
+                {
+                    "dias": 185,
+                    "percentual": 71.0
+                },
+                {
+                    "dias": 186,
+                    "percentual": 71.2
+                },
+                {
+                    "dias": 187,
+                    "percentual": 71.4
+                },
+                {
+                    "dias": 188,
+                    "percentual": 71.6
+                },
+                {
+                    "dias": 189,
+                    "percentual": 71.8
+                },
+                {
+                    "dias": 190,
+                    "percentual": 72.0
+                },
+                {
+                    "dias": 191,
+                    "percentual": 72.2
+                },
+                {
+                    "dias": 192,
+                    "percentual": 72.4
+                },
+                {
+                    "dias": 193,
+                    "percentual": 72.6
+                },
+                {
+                    "dias": 194,
+                    "percentual": 72.8
+                },
+                {
+                    "dias": 195,
+                    "percentual": 73.0
+                },
+                {
+                    "dias": 196,
+                    "percentual": 73.13
+                },
+                {
+                    "dias": 197,
+                    "percentual": 73.27
+                },
+                {
+                    "dias": 198,
+                    "percentual": 73.4
+                },
+                {
+                    "dias": 199,
+                    "percentual": 73.53
+                },
+                {
+                    "dias": 200,
+                    "percentual": 73.67
+                },
+                {
+                    "dias": 201,
+                    "percentual": 73.8
+                },
+                {
+                    "dias": 202,
+                    "percentual": 73.93
+                },
+                {
+                    "dias": 203,
+                    "percentual": 74.07
+                },
+                {
+                    "dias": 204,
+                    "percentual": 74.2
+                },
+                {
+                    "dias": 205,
+                    "percentual": 74.33
+                },
+                {
+                    "dias": 206,
+                    "percentual": 74.47
+                },
+                {
+                    "dias": 207,
+                    "percentual": 74.6
+                },
+                {
+                    "dias": 208,
+                    "percentual": 74.73
+                },
+                {
+                    "dias": 209,
+                    "percentual": 74.87
+                },
+                {
+                    "dias": 210,
+                    "percentual": 75.0
+                },
+                {
+                    "dias": 211,
+                    "percentual": 75.2
+                },
+                {
+                    "dias": 212,
+                    "percentual": 75.4
+                },
+                {
+                    "dias": 213,
+                    "percentual": 75.6
+                },
+                {
+                    "dias": 214,
+                    "percentual": 75.8
+                },
+                {
+                    "dias": 215,
+                    "percentual": 76.0
+                },
+                {
+                    "dias": 216,
+                    "percentual": 76.2
+                },
+                {
+                    "dias": 217,
+                    "percentual": 76.4
+                },
+                {
+                    "dias": 218,
+                    "percentual": 76.6
+                },
+                {
+                    "dias": 219,
+                    "percentual": 76.8
+                },
+                {
+                    "dias": 220,
+                    "percentual": 77.0
+                },
+                {
+                    "dias": 221,
+                    "percentual": 77.2
+                },
+                {
+                    "dias": 222,
+                    "percentual": 77.4
+                },
+                {
+                    "dias": 223,
+                    "percentual": 77.6
+                },
+                {
+                    "dias": 224,
+                    "percentual": 77.8
+                },
+                {
+                    "dias": 225,
+                    "percentual": 78.0
+                },
+                {
+                    "dias": 226,
+                    "percentual": 78.13
+                },
+                {
+                    "dias": 227,
+                    "percentual": 78.27
+                },
+                {
+                    "dias": 228,
+                    "percentual": 78.4
+                },
+                {
+                    "dias": 229,
+                    "percentual": 78.53
+                },
+                {
+                    "dias": 230,
+                    "percentual": 78.67
+                },
+                {
+                    "dias": 231,
+                    "percentual": 78.8
+                },
+                {
+                    "dias": 232,
+                    "percentual": 78.93
+                },
+                {
+                    "dias": 233,
+                    "percentual": 79.07
+                },
+                {
+                    "dias": 234,
+                    "percentual": 79.2
+                },
+                {
+                    "dias": 235,
+                    "percentual": 79.33
+                },
+                {
+                    "dias": 236,
+                    "percentual": 79.47
+                },
+                {
+                    "dias": 237,
+                    "percentual": 79.6
+                },
+                {
+                    "dias": 238,
+                    "percentual": 79.73
+                },
+                {
+                    "dias": 239,
+                    "percentual": 79.87
+                },
+                {
+                    "dias": 240,
+                    "percentual": 80.0
+                },
+                {
+                    "dias": 241,
+                    "percentual": 80.2
+                },
+                {
+                    "dias": 242,
+                    "percentual": 80.4
+                },
+                {
+                    "dias": 243,
+                    "percentual": 80.6
+                },
+                {
+                    "dias": 244,
+                    "percentual": 80.8
+                },
+                {
+                    "dias": 245,
+                    "percentual": 81.0
+                },
+                {
+                    "dias": 246,
+                    "percentual": 81.2
+                },
+                {
+                    "dias": 247,
+                    "percentual": 81.4
+                },
+                {
+                    "dias": 248,
+                    "percentual": 81.6
+                },
+                {
+                    "dias": 249,
+                    "percentual": 81.8
+                },
+                {
+                    "dias": 250,
+                    "percentual": 82.0
+                },
+                {
+                    "dias": 251,
+                    "percentual": 82.2
+                },
+                {
+                    "dias": 252,
+                    "percentual": 82.4
+                },
+                {
+                    "dias": 253,
+                    "percentual": 82.6
+                },
+                {
+                    "dias": 254,
+                    "percentual": 82.8
+                },
+                {
+                    "dias": 255,
+                    "percentual": 83.0
+                },
+                {
+                    "dias": 256,
+                    "percentual": 83.13
+                },
+                {
+                    "dias": 257,
+                    "percentual": 83.27
+                },
+                {
+                    "dias": 258,
+                    "percentual": 83.4
+                },
+                {
+                    "dias": 259,
+                    "percentual": 83.53
+                },
+                {
+                    "dias": 260,
+                    "percentual": 83.67
+                },
+                {
+                    "dias": 261,
+                    "percentual": 83.8
+                },
+                {
+                    "dias": 262,
+                    "percentual": 83.93
+                },
+                {
+                    "dias": 263,
+                    "percentual": 84.07
+                },
+                {
+                    "dias": 264,
+                    "percentual": 84.2
+                },
+                {
+                    "dias": 265,
+                    "percentual": 84.33
+                },
+                {
+                    "dias": 266,
+                    "percentual": 84.47
+                },
+                {
+                    "dias": 267,
+                    "percentual": 84.6
+                },
+                {
+                    "dias": 268,
+                    "percentual": 84.73
+                },
+                {
+                    "dias": 269,
+                    "percentual": 84.87
+                },
+                {
+                    "dias": 270,
+                    "percentual": 85.0
+                },
+                {
+                    "dias": 271,
+                    "percentual": 85.2
+                },
+                {
+                    "dias": 272,
+                    "percentual": 85.4
+                },
+                {
+                    "dias": 273,
+                    "percentual": 85.6
+                },
+                {
+                    "dias": 274,
+                    "percentual": 85.8
+                },
+                {
+                    "dias": 275,
+                    "percentual": 86.0
+                },
+                {
+                    "dias": 276,
+                    "percentual": 86.2
+                },
+                {
+                    "dias": 277,
+                    "percentual": 86.4
+                },
+                {
+                    "dias": 278,
+                    "percentual": 86.6
+                },
+                {
+                    "dias": 279,
+                    "percentual": 86.8
+                },
+                {
+                    "dias": 280,
+                    "percentual": 87.0
+                },
+                {
+                    "dias": 281,
+                    "percentual": 87.2
+                },
+                {
+                    "dias": 282,
+                    "percentual": 87.4
+                },
+                {
+                    "dias": 283,
+                    "percentual": 87.6
+                },
+                {
+                    "dias": 284,
+                    "percentual": 87.8
+                },
+                {
+                    "dias": 285,
+                    "percentual": 88.0
+                },
+                {
+                    "dias": 286,
+                    "percentual": 88.13
+                },
+                {
+                    "dias": 287,
+                    "percentual": 88.27
+                },
+                {
+                    "dias": 288,
+                    "percentual": 88.4
+                },
+                {
+                    "dias": 289,
+                    "percentual": 88.53
+                },
+                {
+                    "dias": 290,
+                    "percentual": 88.67
+                },
+                {
+                    "dias": 291,
+                    "percentual": 88.8
+                },
+                {
+                    "dias": 292,
+                    "percentual": 88.93
+                },
+                {
+                    "dias": 293,
+                    "percentual": 89.07
+                },
+                {
+                    "dias": 294,
+                    "percentual": 89.2
+                },
+                {
+                    "dias": 295,
+                    "percentual": 89.33
+                },
+                {
+                    "dias": 296,
+                    "percentual": 89.47
+                },
+                {
+                    "dias": 297,
+                    "percentual": 89.6
+                },
+                {
+                    "dias": 298,
+                    "percentual": 89.73
+                },
+                {
+                    "dias": 299,
+                    "percentual": 89.87
+                },
+                {
+                    "dias": 300,
+                    "percentual": 90.0
+                },
+                {
+                    "dias": 301,
+                    "percentual": 90.2
+                },
+                {
+                    "dias": 302,
+                    "percentual": 90.4
+                },
+                {
+                    "dias": 303,
+                    "percentual": 90.6
+                },
+                {
+                    "dias": 304,
+                    "percentual": 90.8
+                },
+                {
+                    "dias": 305,
+                    "percentual": 91.0
+                },
+                {
+                    "dias": 306,
+                    "percentual": 91.2
+                },
+                {
+                    "dias": 307,
+                    "percentual": 91.4
+                },
+                {
+                    "dias": 308,
+                    "percentual": 91.6
+                },
+                {
+                    "dias": 309,
+                    "percentual": 91.8
+                },
+                {
+                    "dias": 310,
+                    "percentual": 92.0
+                },
+                {
+                    "dias": 311,
+                    "percentual": 92.2
+                },
+                {
+                    "dias": 312,
+                    "percentual": 92.4
+                },
+                {
+                    "dias": 313,
+                    "percentual": 92.6
+                },
+                {
+                    "dias": 314,
+                    "percentual": 92.8
+                },
+                {
+                    "dias": 315,
+                    "percentual": 93.0
+                },
+                {
+                    "dias": 316,
+                    "percentual": 93.13
+                },
+                {
+                    "dias": 317,
+                    "percentual": 93.27
+                },
+                {
+                    "dias": 318,
+                    "percentual": 93.4
+                },
+                {
+                    "dias": 319,
+                    "percentual": 93.53
+                },
+                {
+                    "dias": 320,
+                    "percentual": 93.67
+                },
+                {
+                    "dias": 321,
+                    "percentual": 93.8
+                },
+                {
+                    "dias": 322,
+                    "percentual": 93.93
+                },
+                {
+                    "dias": 323,
+                    "percentual": 94.07
+                },
+                {
+                    "dias": 324,
+                    "percentual": 94.2
+                },
+                {
+                    "dias": 325,
+                    "percentual": 94.33
+                },
+                {
+                    "dias": 326,
+                    "percentual": 94.47
+                },
+                {
+                    "dias": 327,
+                    "percentual": 94.6
+                },
+                {
+                    "dias": 328,
+                    "percentual": 94.73
+                },
+                {
+                    "dias": 329,
+                    "percentual": 94.87
+                },
+                {
+                    "dias": 330,
+                    "percentual": 95.0
+                },
+                {
+                    "dias": 331,
+                    "percentual": 95.2
+                },
+                {
+                    "dias": 332,
+                    "percentual": 95.4
+                },
+                {
+                    "dias": 333,
+                    "percentual": 95.6
+                },
+                {
+                    "dias": 334,
+                    "percentual": 95.8
+                },
+                {
+                    "dias": 335,
+                    "percentual": 96.0
+                },
+                {
+                    "dias": 336,
+                    "percentual": 96.2
+                },
+                {
+                    "dias": 337,
+                    "percentual": 96.4
+                },
+                {
+                    "dias": 338,
+                    "percentual": 96.6
+                },
+                {
+                    "dias": 339,
+                    "percentual": 96.8
+                },
+                {
+                    "dias": 340,
+                    "percentual": 97.0
+                },
+                {
+                    "dias": 341,
+                    "percentual": 97.2
+                },
+                {
+                    "dias": 342,
+                    "percentual": 97.4
+                },
+                {
+                    "dias": 343,
+                    "percentual": 97.6
+                },
+                {
+                    "dias": 344,
+                    "percentual": 97.8
+                },
+                {
+                    "dias": 345,
+                    "percentual": 98.0
+                },
+                {
+                    "dias": 346,
+                    "percentual": 98.1
+                },
+                {
+                    "dias": 347,
+                    "percentual": 98.2
+                },
+                {
+                    "dias": 348,
+                    "percentual": 98.3
+                },
+                {
+                    "dias": 349,
+                    "percentual": 98.4
+                },
+                {
+                    "dias": 350,
+                    "percentual": 98.5
+                },
+                {
+                    "dias": 351,
+                    "percentual": 98.6
+                },
+                {
+                    "dias": 352,
+                    "percentual": 98.7
+                },
+                {
+                    "dias": 353,
+                    "percentual": 98.8
+                },
+                {
+                    "dias": 354,
+                    "percentual": 98.9
+                },
+                {
+                    "dias": 355,
+                    "percentual": 99.0
+                },
+                {
+                    "dias": 356,
+                    "percentual": 99.1
+                },
+                {
+                    "dias": 357,
+                    "percentual": 99.2
+                },
+                {
+                    "dias": 358,
+                    "percentual": 99.3
+                },
+                {
+                    "dias": 359,
+                    "percentual": 99.4
+                },
+                {
+                    "dias": 360,
+                    "percentual": 99.5
+                },
+                {
+                    "dias": 361,
+                    "percentual": 99.6
+                },
+                {
+                    "dias": 362,
+                    "percentual": 99.7
+                },
+                {
+                    "dias": 363,
+                    "percentual": 99.8
+                },
+                {
+                    "dias": 364,
+                    "percentual": 99.9
+                },
+                {
+                    "dias": 365,
+                    "percentual": 100.0
+                }
+        ];
+    </script>
+</head>
+<body>
+
+    <div class="main-content">
+        <div class="tabs-ramos">
+            <button class="tab-ramo active" onclick="selectMethod(1)">Por Parcelas</button>
+            <button class="tab-ramo" onclick="selectMethod(2)">Por Período</button>
+            <button class="tab-ramo" onclick="selectMethod(3)">Pro Rata</button>
+            <button class="tab-ramo" onclick="selectMethod(4)">Entre Datas</button>
+            <button class="tab-ramo" onclick="selectMethod(5)">Prêmio Líquido</button>
+        </div>
+
+        <!-- Método 1: Por Parcelas -->
+        <div id="method1" class="form-section">
+            <div class="header-section" onclick="toggleSection('method1')">
+                <div class="header-title">
+                    <span class="header-icon">▼</span>
+                    Cálculo por Parcelas
+                </div>
+            </div>
+            <div class="form-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="premioLiquido1">Prêmio Líquido (R$)</label>
+                        <input type="number" id="premioLiquido1" step="0.01" placeholder="0,00">
+                    </div>
+                    <div class="form-group">
+                        <label for="qtdeParcelas1">Quantidade de Parcelas</label>
+                        <input type="number" id="qtdeParcelas1" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="parcelasPagas1">Parcelas Pagas</label>
+                        <input type="number" id="parcelasPagas1" placeholder="0">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-limpar" onclick="limparFormulario(1)">Limpar</button>
+                    <button class="btn btn-processar" onclick="calculateMethod1()">Processar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Método 2: Por Período -->
+        <div id="method2" class="form-section" style="display: none;">
+            <div class="header-section" onclick="toggleSection('method2')">
+                <div class="header-title">
+                    <span class="header-icon">▼</span>
+                    Consulta por Período
+                </div>
+            </div>
+            <div class="form-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataInicial">Data Inicial</label>
+                        <input type="date" id="dataInicial">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataFinal">Data Final</label>
+                        <input type="date" id="dataFinal">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-limpar" onclick="limparFormulario(2)">Limpar</button>
+                    <button class="btn btn-processar" onclick="calculateMethod2()">Processar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Método 3: Pro Rata -->
+        <div id="method3" class="form-section" style="display: none;">
+            <div class="header-section" onclick="toggleSection('method3')">
+                <div class="header-title">
+                    <span class="header-icon">▼</span>
+                    Cálculo Pro Rata
+                </div>
+            </div>
+            <div class="form-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="premioLiquido2">Prêmio Líquido (R$)</label>
+                        <input type="number" id="premioLiquido2" step="0.01" placeholder="0,00">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataInicial2">Data do Cancelamento</label>
+                        <input type="date" id="dataInicial2">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataFinal2">Data Final da Vigência</label>
+                        <input type="date" id="dataFinal2">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-limpar" onclick="limparFormulario(3)">Limpar</button>
+                    <button class="btn btn-processar" onclick="calculateMethod3()">Processar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Método 4: Entre Datas -->
+        <div id="method4" class="form-section" style="display: none;">
+            <div class="header-section" onclick="toggleSection('method4')">
+                <div class="header-title">
+                    <span class="header-icon">▼</span>
+                    Período entre Datas
+                </div>
+            </div>
+            <div class="form-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dataInicial3">Data Inicial</label>
+                        <input type="date" id="dataInicial3">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataFinal3">Data Final</label>
+                        <input type="date" id="dataFinal3">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-limpar" onclick="limparFormulario(4)">Limpar</button>
+                    <button class="btn btn-processar" onclick="calculateMethod4()">Processar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Método 5: Prêmio Líquido -->
+        <div id="method5" class="form-section" style="display: none;">
+            <div class="header-section" onclick="toggleSection('method5')">
+                <div class="header-title">
+                    <span class="header-icon">▼</span>
+                    Calcular Prêmio Líquido
+                </div>
+            </div>
+            <div class="form-content">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="premioTotal">Prêmio Total (R$)</label>
+                        <input type="number" id="premioTotal" step="0.01" placeholder="0,00">
+                    </div>
+                    <div class="form-group">
+                        <label for="porcIof">Porcentagem IOF (%)</label>
+                        <input type="number" id="porcIof" step="0.01" placeholder="0,00">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-limpar" onclick="limparFormulario(5)">Limpar</button>
+                    <button class="btn btn-processar" onclick="calculateMethod5()">Processar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Alertas -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Resultados -->
+        <div id="results" class="results">
+            <div class="result-header">Resultados</div>
+            <div class="result-grid">
+                <div class="result-item">
+                    <label>Prêmio Líquido</label>
+                    <div class="value" id="resultPremioLiquido">R$ 0,00</div>
+                </div>
+                <div class="result-item">
+                    <label>Prêmio Devido</label>
+                    <div class="value" id="resultPremioDevido">R$ 0,00</div>
+                </div>
+                <div class="result-item">
+                    <label>Prêmio Cancelado</label>
+                    <div class="value" id="resultPremioCancelado">R$ 0,00</div>
+                </div>
+                <div class="result-item">
+                    <label>% Tabela de Prazo Curto</label>
+                    <div class="value" id="resultPercentual">0%</div>
+                </div>
+                <div class="result-item" id="diasCorridosResult" style="display: none;">
+                    <label>Dias Corridos</label>
+                    <div class="value" id="resultDiasCorridos">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-tabela" onclick="showTable()">📋 Ver Tabela de Referência</button>
+        </div>
+    </div>
+
+    <!-- Modal da Tabela de Referência -->
+    <div id="tableModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tabela de Referência de Proporção</h2>
+                <button class="close" onclick="closeTable()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table class="reference-table">
+                    <thead>
+                        <tr>
+                            <th>% Proporção</th>
+                            <th>Dias de Vigência</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectMethod(method) {
+            const sections = ['method1', 'method2', 'method3', 'method4', 'method5'];
+            const buttons = document.querySelectorAll('.tab-ramo');
+            
+            sections.forEach(section => {
+                document.getElementById(section).style.display = 'none';
+            });
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('method' + method).style.display = 'block';
+            buttons[method - 1].classList.add('active');
+            
+            hideResults();
+            hideAlert();
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('fechado');
+        }
+
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = 'alert show ' + type;
+            setTimeout(() => {
+                hideAlert();
+            }, 5000);
+        }
+
+        function hideAlert() {
+            const alert = document.getElementById('alert');
+            alert.classList.remove('show');
+        }
+
+        function showResults() {
+            document.getElementById('results').classList.add('show');
+        }
+
+        function hideResults() {
+            document.getElementById('results').classList.remove('show');
+        }
+
+        function limparFormulario(method) {
+            if (method === 1) {
+                document.getElementById('premioLiquido1').value = '';
+                document.getElementById('qtdeParcelas1').value = '';
+                document.getElementById('parcelasPagas1').value = '';
+            } else if (method === 2) {
+                document.getElementById('dataInicial').value = '';
+                document.getElementById('dataFinal').value = '';
+            } else if (method === 3) {
+                document.getElementById('premioLiquido2').value = '';
+                document.getElementById('dataInicial2').value = '';
+                document.getElementById('dataFinal2').value = '';
+            } else if (method === 4) {
+                document.getElementById('dataInicial3').value = '';
+                document.getElementById('dataFinal3').value = '';
+            } else if (method === 5) {
+                document.getElementById('premioTotal').value = '';
+                document.getElementById('porcIof').value = '';
+            }
+            hideResults();
+            hideAlert();
+        }
+
+        function calculateMethod1() {
+            const premioLiquido = parseFloat(document.getElementById('premioLiquido1').value);
+            const qtdeParcelas = parseInt(document.getElementById('qtdeParcelas1').value);
+            const parcelasPagas = parseInt(document.getElementById('parcelasPagas1').value);
+
+            if (!premioLiquido || !qtdeParcelas || parcelasPagas === null || parcelasPagas === undefined) {
+                showAlert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            if (parcelasPagas > qtdeParcelas) {
+                showAlert('O número de parcelas pagas não pode ser maior que o total de parcelas.');
+                return;
+            }
+
+            const percentualTabelaPrazoCurto = (parcelasPagas / qtdeParcelas) * 100;
+            const premioDevido = premioLiquido * (percentualTabelaPrazoCurto / 100);
+            const premioCancelado = premioLiquido - premioDevido;
+
+            displayResults(premioLiquido, premioDevido, premioCancelado, percentualTabelaPrazoCurto);
+            document.getElementById('diasCorridosResult').style.display = 'none';
+        }
+
+        function calculateMethod2() {
+            const dataInicial = new Date(document.getElementById('dataInicial').value);
+            const dataFinal = new Date(document.getElementById('dataFinal').value);
+
+            if (!dataInicial || !dataFinal) {
+                showAlert('Por favor, preencha as datas inicial e final.');
+                return;
+            }
+
+            if (dataFinal <= dataInicial) {
+                showAlert('A data final deve ser posterior à data inicial.');
+                return;
+            }
+
+            const diasCorridos = Math.ceil((dataFinal - dataInicial) / (1000 * 60 * 60 * 24));
+            const percentualTabelaPrazoCurto = getPercentualByDias(diasCorridos);
+
+            displayMethod2Results(diasCorridos, percentualTabelaPrazoCurto);
+        }
+        
+        function calculateMethod3() {
+            const premioLiquido = parseFloat(document.getElementById('premioLiquido2').value);
+            const dataInicial = new Date(document.getElementById('dataInicial2').value);
+            const dataFinal = new Date(document.getElementById('dataFinal2').value);
+
+            if (!premioLiquido || !dataInicial || !dataFinal) {
+                showAlert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            if (dataFinal <= dataInicial) {
+                showAlert('A data final deve ser posterior à data inicial.');
+                return;
+            }
+
+            const diasCorridos = Math.ceil((dataFinal - dataInicial) / (1000 * 60 * 60 * 24));
+            const percentualTabelaPrazoCurto = premioLiquido / 365;
+            const premioDevido = diasCorridos * percentualTabelaPrazoCurto;
+
+            displayMethod3Results(diasCorridos, premioDevido);
+        }
+
+        function calculateMethod4() {
+            const data1 = new Date(document.getElementById("dataInicial3").value);
+            const data2 = new Date(document.getElementById("dataFinal3").value);
+
+            if (!data1 || !data2) {
+                showAlert("Por favor, selecione ambas as datas.");
+                return;
+            }
+
+            let diffTime = Math.abs(data2 - data1);
+            let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            let anos = Math.floor(diffDays / 365);
+            let meses = Math.floor((diffDays % 365) / 30);
+            let dias = diffDays - anos * 365 - meses * 30;
+
+            displayMethod4Results(`${anos} anos, ${meses} meses e ${dias} dias (${diffDays} dias no total)`);
+        }
+        
+        function calculateMethod5(){
+            let valor_iof = document.getElementById("porcIof").value;
+            let valor_premio_total = document.getElementById('premioTotal').value;
+            
+            if (!valor_iof){
+                valor_iof = 0;
+            }
+            if (!valor_premio_total){
+                valor_premio_total = 0;
+            }
+            
+            let total = valor_premio_total / (1 + (valor_iof / 100));
+            
+            displayMethod5Results(total);
+        }
+
+        function getPercentualByDias(dias) {
+            for (let i = 0; i < tabelaReferencia.length; i++) {
+                if (dias <= tabelaReferencia[i].dias) {
+                    return tabelaReferencia[i].percentual;
+                }
+            }
+            return 100;
+        }
+        
+        function displayMethod3Results(diasCorridos, percentual) {
+            document.getElementById('resultPremioLiquido').parentElement.style.display = 'none';
+            document.getElementById('resultPercentual').parentElement.style.display = 'none';
+            document.getElementById('resultPremioCancelado').parentElement.style.display = 'none';
+            
+            document.getElementById('resultPremioDevido').textContent = formatCurrency(percentual.toFixed(2));
+            document.getElementById('diasCorridosResult').style.display = 'block';
+            document.getElementById('resultDiasCorridos').textContent = diasCorridos + ' dias';
+            
+            showResults();
+        }
+
+        function displayMethod2Results(diasCorridos, percentual) {
+            document.getElementById('resultPremioLiquido').parentElement.style.display = 'none';
+            document.getElementById('resultPremioDevido').parentElement.style.display = 'none';
+            document.getElementById('resultPremioCancelado').parentElement.style.display = 'none';
+            
+            document.getElementById('resultPercentual').textContent = percentual.toFixed(2) + '%';
+            document.getElementById('diasCorridosResult').style.display = 'block';
+            document.getElementById('resultDiasCorridos').textContent = diasCorridos + ' dias';
+            
+            showResults();
+        }
+        
+        function displayMethod4Results(diasCorridos) {
+            document.getElementById('resultPremioLiquido').parentElement.style.display = 'none';
+            document.getElementById('resultPremioDevido').parentElement.style.display = 'none';
+            document.getElementById('resultPremioCancelado').parentElement.style.display = 'none';
+            document.getElementById('resultPercentual').parentElement.style.display = 'none';
+            
+            document.getElementById('diasCorridosResult').style.display = 'block';
+            document.getElementById('resultDiasCorridos').textContent = diasCorridos;
+            
+            showResults();
+        }
+        
+        function displayMethod5Results(premioLiquido) {
+            document.getElementById('resultPremioDevido').parentElement.style.display = 'none';
+            document.getElementById('resultPremioCancelado').parentElement.style.display = 'none';
+            document.getElementById('resultPercentual').parentElement.style.display = 'none';
+            document.getElementById('diasCorridosResult').style.display = 'none';
+            
+            document.getElementById('resultPremioLiquido').parentElement.style.display = 'block';
+            document.getElementById('resultPremioLiquido').textContent = formatCurrency(premioLiquido);
+            
+            showResults();
+        }
+
+        function displayResults(premioLiquido, premioDevido, premioCancelado, percentual) {
+            document.getElementById('resultPremioLiquido').parentElement.style.display = 'block';
+            document.getElementById('resultPremioDevido').parentElement.style.display = 'block';
+            document.getElementById('resultPremioCancelado').parentElement.style.display = 'block';
+            document.getElementById('resultPercentual').parentElement.style.display = 'block';
+            
+            document.getElementById('resultPremioLiquido').textContent = formatCurrency(premioLiquido);
+            document.getElementById('resultPremioDevido').textContent = formatCurrency(premioDevido);
+            document.getElementById('resultPremioCancelado').textContent = formatCurrency(premioCancelado);
+            document.getElementById('resultPercentual').textContent = percentual.toFixed(2) + '%';
+            
+            document.getElementById('diasCorridosResult').style.display = 'none';
+            
+            showResults();
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        function showTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            tabelaReferencia.forEach(item => {
+                const row = tableBody.insertRow();
+                const cellPercentual = row.insertCell(0);
+                const cellDias = row.insertCell(1);
+
+                let percentual = parseFloat(item.percentual).toFixed(2);
+
+                if (percentual < 10) {
+                    percentual = "0" + percentual;
+                }
+
+                cellPercentual.textContent = percentual + "%";
+                cellDias.textContent = item.dias + ' dias';
+            });
+            
+            document.getElementById('tableModal').classList.add('show');
+        }
+
+        function closeTable() {
+            document.getElementById('tableModal').classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('tableModal');
+            if (event.target == modal) {
+                closeTable();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,1 +1,168 @@
 
+
+<style>
+  .menu-wrap { padding: 0; font-family: Arial, sans-serif; }
+  .top-bar { background: white; padding: 8px 15px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+  .top-bar-left { color: #3d7399; font-size: 13px; font-weight: bold; }
+  .top-bar-right { color: #666; font-size: 11px; }
+  .menu-body { background: #e8e8e8; padding: 20px; min-height: 400px; }
+  .menu-header { background: #4a6675; color: white; padding: 12px 15px; display: flex; align-items: center; gap: 8px; border-bottom: 3px solid #3d5560; margin-bottom: 20px; }
+  .menu-header span { font-size: 14px; font-weight: bold; }
+  .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .menu-card { background: white; border: 1px solid #ccc; cursor: pointer; transition: all 0.15s ease; text-decoration: none; display: flex; flex-direction: column; overflow: hidden; }
+  .menu-card:hover { border-color: #4a6675; box-shadow: 0 2px 8px rgba(74,102,117,0.18); transform: translateY(-1px); }
+  .menu-card:active { transform: translateY(0); }
+  .card-accent { height: 4px; }
+  .card-body { padding: 14px 14px 12px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .card-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+  .card-icon svg { width: 22px; height: 22px; }
+  .card-title { font-size: 13px; font-weight: bold; color: #333; }
+  .card-desc { font-size: 11px; color: #777; line-height: 1.4; }
+  .card-footer { padding: 8px 14px; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
+  .card-footer-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card-arrow { color: #4a6675; font-size: 14px; font-weight: bold; }
+  .section-divider { margin: 20px 0 10px; font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+  @media (max-width: 600px) { .menu-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<div class="menu-wrap">
+  <div class="top-bar">
+    <div class="top-bar-left">Sistema de Cálculos — Seguros</div>
+    <div class="top-bar-right">Selecione uma função</div>
+  </div>
+  <div class="menu-body">
+    <div class="menu-header">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="white" opacity="0.9"/><rect x="9" y="1" width="6" height="6" rx="1" fill="white" opacity="0.9"/><rect x="1" y="9" width="6" height="6" rx="1" fill="white" opacity="0.9"/><rect x="9" y="9" width="6" height="6" rx="1" fill="white" opacity="0.9"/></svg>
+      <span>Menu Principal — Selecione uma Função</span>
+    </div>
+
+        <div class="menu-grid">
+
+      <a class="menu-card" href="prazo_curto.html">
+        <div class="card-accent" style="background:#4a6675;"></div>
+        <div class="card-body">
+          <div class="card-icon">
+            <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="4" width="18" height="14" rx="1" stroke="#4a6675" stroke-width="1.5" fill="none"/>
+              <line x1="2" y1="8" x2="20" y2="8" stroke="#4a6675" stroke-width="1.2"/>
+              <line x1="7" y1="8" x2="7" y2="18" stroke="#4a6675" stroke-width="1.2"/>
+              <rect x="9" y="11" width="4" height="3" rx="0.5" fill="#4a6675" opacity="0.5"/>
+              <rect x="14" y="11" width="4" height="3" rx="0.5" fill="#4a6675" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="card-title">Por Parcelas</div>
+          <div class="card-desc">Calcula prêmio devido e cancelado com base nas parcelas pagas.</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-label">Prazo Curto</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </a>
+
+      <!-- <a class="menu-card" href="periodo.html">
+        <div class="card-accent" style="background:#5bc0de;"></div>
+        <div class="card-body">
+          <div class="card-icon">
+            <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="4" width="16" height="15" rx="1" stroke="#5bc0de" stroke-width="1.5" fill="none"/>
+              <line x1="7" y1="2" x2="7" y2="6" stroke="#5bc0de" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="15" y1="2" x2="15" y2="6" stroke="#5bc0de" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="3" y1="9" x2="19" y2="9" stroke="#5bc0de" stroke-width="1.2"/>
+              <circle cx="8" cy="13" r="1.5" fill="#5bc0de" opacity="0.6"/>
+              <circle cx="14" cy="13" r="1.5" fill="#5bc0de" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="card-title">Por Período</div>
+          <div class="card-desc">Consulta o percentual da tabela com base no intervalo entre datas.</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-label">Prazo Curto</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </a>
+
+      <a class="menu-card" href="prorata.html">
+        <div class="card-accent" style="background:#f0ad4e;"></div>
+        <div class="card-body">
+          <div class="card-icon">
+            <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="11" r="8" stroke="#f0ad4e" stroke-width="1.5" fill="none"/>
+              <path d="M11 11 L11 3" stroke="#f0ad4e" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M11 11 L17 15" stroke="#f0ad4e" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M3.5 6.5 A8 8 0 0 1 17 6.5" stroke="#f0ad4e" stroke-width="1.2" fill="none" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="card-title">Pro Rata</div>
+          <div class="card-desc">Calcula o prêmio devolvido proporcionalmente ao tempo restante.</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-label">Prazo Curto</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </a>
+
+      <a class="menu-card" href="entre-datas.html">
+        <div class="card-accent" style="background:#6e8f3c;"></div>
+        <div class="card-body">
+          <div class="card-icon">
+            <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="2" y1="11" x2="20" y2="11" stroke="#6e8f3c" stroke-width="1.5"/>
+              <circle cx="5" cy="11" r="2.5" stroke="#6e8f3c" stroke-width="1.5" fill="none"/>
+              <circle cx="17" cy="11" r="2.5" stroke="#6e8f3c" stroke-width="1.5" fill="none"/>
+              <line x1="5" y1="6" x2="5" y2="8" stroke="#6e8f3c" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="17" y1="6" x2="17" y2="8" stroke="#6e8f3c" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="11" y1="8" x2="11" y2="14" stroke="#6e8f3c" stroke-width="1" stroke-dasharray="1.5 1.5" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="card-title">Entre Datas</div>
+          <div class="card-desc">Calcula a diferença em dias, meses e anos entre duas datas.</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-label">Utilitário</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </a>
+
+      <a class="menu-card" href="premio-liquido.html">
+        <div class="card-accent" style="background:#d9534f;"></div>
+        <div class="card-body">
+          <div class="card-icon">
+            <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="11" r="8" stroke="#d9534f" stroke-width="1.5" fill="none"/>
+              <text x="11" y="15" text-anchor="middle" font-size="10" font-weight="bold" fill="#d9534f">R$</text>
+            </svg>
+          </div>
+          <div class="card-title">Prêmio Líquido</div>
+          <div class="card-desc">Extrai o prêmio líquido a partir do prêmio total descontando o IOF.</div>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-label">Utilitário</span>
+          <span class="card-arrow">›</span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="section-divider" style="margin-top:24px;">Referência</div>
+    <div class="menu-grid" style="grid-template-columns: 1fr;">
+      <a class="menu-card" href="tabela.html" style="flex-direction: row; align-items: center;">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;flex:1;">
+          <div class="card-icon" style="margin:0;">
+            <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="18" height="18" rx="1" stroke="#888" stroke-width="1.5" fill="none"/>
+              <line x1="2" y1="7" x2="20" y2="7" stroke="#888" stroke-width="1.2"/>
+              <line x1="2" y1="12" x2="20" y2="12" stroke="#888" stroke-width="1.2"/>
+              <line x1="8" y1="7" x2="8" y2="20" stroke="#888" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Tabela de Referência — Prazo Curto</div>
+            <div class="card-desc">Consulte a tabela completa de percentuais por dias de vigência (0 a 365 dias).</div>
+          </div>
+        </div>
+        <div style="padding-right:16px;color:#4a6675;font-size:16px;font-weight:bold;">›</div>
+      </a>
+    </div> -->
+
+  </div>
+</div>

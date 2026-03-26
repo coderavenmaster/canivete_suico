@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://www.scalaseguros.com.br/storage/app/uploads/public/5eb/eaf/184/5ebeaf1848286440445874.ico">
+    <title>Gerador de Documentos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e8e8e8;
+            color: #333;
+            font-size: 13px;
+            margin: 5px;
+        }
+
+        .top-bar {
+            background-color: white;
+            padding: 8px 15px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar-left {
+            color: #3d7399;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-bar-right {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .header-section {
+            background-color: #4a6675;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 3px solid #3d5560;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .header-icon {
+            transition: transform 0.2s ease;
+            font-size: 13px;
+        }
+
+        .form-section.fechado .header-icon {
+            transform: rotate(-90deg);
+        }
+
+        .form-section.fechado .form-content {
+            display: none;
+        }
+
+        .main-content {
+            background-color: white;
+            margin: 0;
+        }
+
+        .form-section {
+            margin: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+            background-color: white;
+        }
+
+        .form-content {
+            padding: 20px;
+        }
+
+        .tabs-ramos {
+            display: flex;
+            gap: 5px;
+            margin: 10px 20px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-ramo {
+            padding: 6px 14px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+
+        .tab-ramo.active {
+            background-color: #4a6675;
+            color: white;
+            border-color: #3d5560;
+        }
+
+        .tab-ramo:hover {
+            background-color: #e6e6e6;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .form-group label .required {
+            color: red;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            background-color: white;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #66afe9;
+            box-shadow: 0 0 3px rgba(102, 175, 233, 0.5);
+        }
+
+        .form-group input:disabled,
+        .form-group select:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .action-buttons {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 15px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 7px 20px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #f5f5f5;
+        }
+
+        .btn-processar {
+            background-color: #5bc0de;
+            color: white;
+            border-color: #5bc0de;
+            font-weight: bold;
+        }
+
+        .btn-processar:hover:not(:disabled) {
+            background-color: #46b8da;
+        }
+
+        .btn-limpar {
+            background-color: #d9534f;
+            color: white;
+            border-color: #d9534f;
+        }
+
+        .btn-limpar:hover:not(:disabled) {
+            background-color: #c9302c;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 10px 12px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            font-size: 12px;
+        }
+
+        .alert.success {
+            background-color: #dff0d8;
+            border-color: #5cb85c;
+            color: #3c763d;
+        }
+
+        .alert.error {
+            background-color: #f2dede;
+            border-color: #d9534f;
+            color: #a94442;
+        }
+
+        .alert.info {
+            background-color: #d9edf7;
+            border-color: #5bc0de;
+            color: #31708f;
+        }
+
+        .message-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .message-display {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 15px;
+            min-height: 120px;
+            margin-top: 10px;
+            line-height: 1.6;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .tabs-ramos {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-content">
+    <!-- Tabs para selecionar tipo de documento -->
+    <div class="tabs-ramos">
+        <button class="tab-ramo active" data-tab="cancelamento">
+            <i class="fa-solid fa-ban"></i> Carta de Cancelamento
+        </button>
+        <button class="tab-ramo" data-tab="sinistralidade">
+            <i class="fa-solid fa-car-burst"></i> Não Sinistralidade
+        </button>
+        <button class="tab-ramo" data-tab="compra">
+            <i class="fa-solid fa-file-contract"></i> Compra e Venda
+        </button>
+        <button class="tab-ramo" data-tab="mensagem">
+            <i class="fa-solid fa-message"></i> Mensagem Restituição
+        </button>
+    </div>
+
+    <!-- SEÇÃO 1: CARTA DE CANCELAMENTO -->
+    <div class="form-section" id="tab-cancelamento">
+        <div class="header-section" onclick="toggleSection(this)">
+            <div class="header-title">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <span>Carta de Cancelamento de Seguro</span>
+            </div>
+        </div>
+        <div class="form-content">
+            <form id="formularioSeguro">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Corretora Líder <span class="required">*</span></label>
+                        <input type="text" id="nome_corretora" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome do Segurado <span class="required">*</span></label>
+                        <input type="text" id="nome_cancelamento" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF/CNPJ <span class="required">*</span></label>
+                        <input type="text" id="segurado_cpf_cancelamento" maxlength="18" oninput="formatarCPFouCNPJ(this)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apólice/Proposta <span class="required">*</span></label>
+                        <input type="text" id="apolice_cancelamento" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data da Solicitação <span class="required">*</span></label>
+                        <input type="date" id="dataSolicitacao_cancelamento" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Seguradora <span class="required">*</span></label>
+                        <select id="seguradora_cancelamento" required>
+                            <option value="">Selecione a Seguradora</option>
+                            <option value="Aliro Seguros">Aliro Seguros</option>
+                            <option value="Allianz Seguros S.A.">Allianz Seguros S.A.</option>
+                            <option value="Azul Companhia de Seguros Gerais">Azul Companhia de Seguros Gerais</option>
+                            <option value="Bradesco Seguros S.A.">Bradesco Seguros S.A.</option>
+                            <option value="BP Seguradora">BP Seguradora</option>
+                            <option value="Gente Seguradora">Gente Seguradora</option>
+                            <option value="HDI Seguros S.A.">HDI Seguros S.A.</option>
+                            <option value="Itau Seguros S.A.">Itau Seguros S.A.</option>
+                            <option value="Mapfre Seguros Gerais S.A.">Mapfre Seguros Gerais S.A.</option>
+                            <option value="MBM Seguradora S.A.">MBM Seguradora S.A.</option>
+                            <option value="Mitsui Sumitomo Seguros S.A.">Mitsui Sumitomo Seguros S.A.</option>
+                            <option value="Porto Seguro Cia de Seguros Gerais">Porto Seguro Cia de Seguros Gerais</option>
+                            <option value="Sompo Seguros S.A.">Sompo Seguros S.A.</option>
+                            <option value="Suhai">Suhai</option>
+                            <option value="Sul América Cia Nacional de Seguros">Sul América Cia Nacional de Seguros</option>
+                            <option value="Sura Seguros">Sura Seguros</option>
+                            <option value="Tokio Marine Seguradora S.A.">Tokio Marine Seguradora S.A.</option>
+                            <option value="YLM Seguros S.A.">YLM Seguros S.A.</option>
+                            <option value="Zurich Minas Brasil Seguros S/A">Zurich Minas Brasil Seguros S/A</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Seguro <span class="required">*</span></label>
+                        <select id="tipoSeguro_cancelamento" onchange="mostrarCampos()" required>
+                            <option value="">Selecione o Tipo</option>
+                            <option value="OUTROS">ACIDENTE PESSOAL PASSAGEIRO</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS - COLETIVOS</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS - INDIVIDUAL</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS DE PASSAGEIROS</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS INDIVIDUAL</option>
+                            <option value="AUTOMÓVEL">AERONÁUTICOS</option>
+                            <option value="AUTOMÓVEL">AERONÁUTICOS - AERO RETA</option>
+                            <option value="OUTROS">AGRICOLA</option>
+                            <option value="AUTOMÓVEL">AUTO - BLLU</option>
+                            <option value="AUTOMÓVEL">AUTO CONSCIENTE</option>
+                            <option value="AUTOMÓVEL">AUTO FROTA</option>
+                            <option value="AUTOMÓVEL">AUTOMAIS ON-LINE</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL MENSAL</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL - CARTA VERDE</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL - FROTA</option>
+                            <option value="AUTOMÓVEL">BIKE</option>
+                            <option value="AUTOMÓVEL">CAMINHÕES</option>
+                            <option value="RESIDENCIAL">CONDOMÍNIO</option>
+                            <option value="AUTOMÓVEL">DUAS RODAS</option>
+                            <option value="AUTOMÓVEL">DUAS RODAS SPECIAL</option>
+                            <option value="RESIDENCIAL">EMPRESARIAL</option>
+                            <option value="AUTOMÓVEL">EQUIPAMENTOS</option>
+                            <option value="AUTOMÓVEL">EQUIPAMENTOS (FROTA)</option>
+                            <option value="RESIDENCIAL">EVENTOS</option>
+                            <option value="RESIDENCIAL">FIANÇA LOCATÍCIA</option>
+                            <option value="OUTROS">FINANCIAMENTO</option>
+                            <option value="AUTOMÓVEL">FROTA</option>
+                            <option value="OUTROS">GARANTIA</option>
+                            <option value="AUTOMÓVEL">HDI - FROTA LEVE</option>
+                            <option value="AUTOMÓVEL">HDI FIT - ROUBO E FURTO</option>
+                            <option value="RESIDENCIAL">IMOBILIARIA</option>
+                            <option value="AUTOMÓVEL">MAPFRE NÁUTICO</option>
+                            <option value="OUTROS">MOBI LIVRE</option>
+                            <option value="AUTOMÓVEL">MOTO</option>
+                            <option value="AUTOMÓVEL">NAUTICA</option>
+                            <option value="OUTROS">ODONTOLÓGICO</option>
+                            <option value="OUTROS">PENHOR RURAL</option>
+                            <option value="OUTROS">PESSOAS INDIVIDUAL - CONSÓRCIO</option>
+                            <option value="OUTROS">PESSOAS INDIVIDUAL - VIAGEM</option>
+                            <option value="OUTROS">PORTO CAPITALIZAÇÃO</option>
+                            <option value="OUTROS">PREVIDENCIA</option>
+                            <option value="OUTROS">PREVIDENCIA INDIVIDUAL</option>
+                            <option value="RESIDENCIAL">PROPRIEDADES RURAIS</option>
+                            <option value="OUTROS">R C DO CONDUTOR DURANTE A MOBILIDADE INDIVIDUAL</option>
+                            <option value="RESIDENCIAL">RESIDENCIAL</option>
+                            <option value="RESIDENCIAL">RESIDENCIAL DUO</option>
+                            <option value="OUTROS">RESPONSABILIDADE CIVIL - PROFISSIONAL</option>
+                            <option value="OUTROS">RESPONSABILIDADES - RC GERAL</option>
+                            <option value="OUTROS">RESPONSABILIDADES - RC PROFISSIONAL</option>
+                            <option value="OUTROS">RISCO DE ENGENHARIA</option>
+                            <option value="OUTROS">RISCOS FINANCEIROS - GARANTIA SEGURADO - SETOR PRI</option>
+                            <option value="OUTROS">RISCOS FINANCEIROS - GARANTIA SEGURADO - SETOR PÚB</option>
+                            <option value="OUTROS">SAÚDE</option>
+                            <option value="OUTROS">SEGURO VIAGEM</option>
+                            <option value="OUTROS">TRANSPORTE - RCF-DC</option>
+                            <option value="OUTROS">TRANSPORTE - RCTR-C</option>
+                            <option value="OUTROS">TRANSPORTES - EMBARCADOR</option>
+                            <option value="OUTROS">VIDA EM GRUPO</option>
+                            <option value="OUTROS">VIDA INDIVIDUAL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Campos específicos para AUTOMÓVEL -->
+                <div id="camposAutomovel" class="hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fabricante/Modelo <span class="required">*</span></label>
+                            <input type="text" id="fabricanteModelo">
+                        </div>
+                        <div class="form-group">
+                            <label>Ano</label>
+                            <input type="number" id="ano" min="1900" max="2099">
+                        </div>
+                        <div class="form-group">
+                            <label>Modelo</label>
+                            <input type="number" id="modelo">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Placa</label>
+                            <input type="text" id="placa" oninput="formatarPlaca(this)" placeholder="AAA-1A23">
+                        </div>
+                        <div class="form-group">
+                            <label>Chassi / Nº de Série <span class="required">*</span></label>
+                            <input type="text" id="chassi">
+                        </div>
+                        <div class="form-group">
+                            <label>Bônus</label>
+                            <input type="number" id="bonus" min="0" max="10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campos específicos para RESIDENCIAL -->
+                <div id="camposResidencial" class="hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CEP <span class="required">*</span></label>
+                            <input type="text" id="cep" placeholder="00000-000" onblur="buscarCep()">
+                        </div>
+                        <div class="form-group">
+                            <label>Logradouro <span class="required">*</span></label>
+                            <input type="text" id="logradouro" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Número <span class="required">*</span></label>
+                            <input type="number" id="numero">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bairro <span class="required">*</span></label>
+                            <input type="text" id="bairro" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Cidade <span class="required">*</span></label>
+                            <input type="text" id="cidade" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado <span class="required">*</span></label>
+                            <input type="text" id="estado" disabled>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Complemento</label>
+                            <input type="text" id="complemento">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-limpar" onclick="limparFormularioCancelamento()">
+                        <i class="fa-solid fa-eraser"></i> Limpar
+                    </button>
+                    <button type="button" class="btn btn-processar" id="botaoGerarPdf_cancelamento" onclick="gerarPDF_cancelamento()" disabled>
+                        <i class="fa-solid fa-file-pdf"></i> Gerar PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 2: CARTA DE NÃO SINISTRALIDADE -->
+    <div class="form-section hidden" id="tab-sinistralidade">
+        <div class="header-section" onclick="toggleSection(this)">
+            <div class="header-title">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <span>Carta de Não Sinistralidade</span>
+            </div>
+        </div>
+        <div class="form-content">
+            <form id="formularioSeguro_sinistralidade">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Segurado <span class="required">*</span></label>
+                        <input type="text" id="nome_sinistralidade" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apólice <span class="required">*</span></label>
+                        <input type="text" id="apolice_sinistralidade" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Endosso</label>
+                        <input type="text" id="endosso_sinistralidade">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data da Solicitação <span class="required">*</span></label>
+                        <input type="date" id="dataSolicitacao_sinistralidade" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Seguradora <span class="required">*</span></label>
+                        <select id="seguradora_sinistralidade" required>
+                            <option value="">Selecione a Seguradora</option>
+                            <option value="Aliro Seguros">Aliro Seguros</option>
+                            <option value="Allianz Seguros S.A.">Allianz Seguros S.A.</option>
+                            <option value="Bradesco Seguros S.A.">Bradesco Seguros S.A.</option>
+                            <option value="Porto Seguro Cia de Seguros Gerais">Porto Seguro Cia de Seguros Gerais</option>
+                            <option value="Tokio Marine Seguradora S.A.">Tokio Marine Seguradora S.A.</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Seguro <span class="required">*</span></label>
+                        <select id="tipoSeguro_sinistralidade" required>
+                            <option value="">Selecione o Tipo</option>
+                            <option value="OUTROS">ACIDENTE PESSOAL PASSAGEIRO</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS - COLETIVOS</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS - INDIVIDUAL</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS DE PASSAGEIROS</option>
+                            <option value="OUTROS">ACIDENTES PESSOAIS INDIVIDUAL</option>
+                            <option value="AUTOMÓVEL">AERONÁUTICOS</option>
+                            <option value="AUTOMÓVEL">AERONÁUTICOS - AERO RETA</option>
+                            <option value="OUTROS">AGRICOLA</option>
+                            <option value="AUTOMÓVEL">AUTO - BLLU</option>
+                            <option value="AUTOMÓVEL">AUTO CONSCIENTE</option>
+                            <option value="AUTOMÓVEL">AUTO FROTA</option>
+                            <option value="AUTOMÓVEL">AUTOMAIS ON-LINE</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL MENSAL</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL - CARTA VERDE</option>
+                            <option value="AUTOMÓVEL">AUTOMÓVEL - FROTA</option>
+                            <option value="AUTOMÓVEL">BIKE</option>
+                            <option value="AUTOMÓVEL">CAMINHÕES</option>
+                            <option value="RESIDENCIAL">CONDOMÍNIO</option>
+                            <option value="AUTOMÓVEL">DUAS RODAS</option>
+                            <option value="AUTOMÓVEL">DUAS RODAS SPECIAL</option>
+                            <option value="RESIDENCIAL">EMPRESARIAL</option>
+                            <option value="AUTOMÓVEL">EQUIPAMENTOS</option>
+                            <option value="AUTOMÓVEL">EQUIPAMENTOS (FROTA)</option>
+                            <option value="RESIDENCIAL">EVENTOS</option>
+                            <option value="RESIDENCIAL">FIANÇA LOCATÍCIA</option>
+                            <option value="OUTROS">FINANCIAMENTO</option>
+                            <option value="AUTOMÓVEL">FROTA</option>
+                            <option value="OUTROS">GARANTIA</option>
+                            <option value="AUTOMÓVEL">HDI - FROTA LEVE</option>
+                            <option value="AUTOMÓVEL">HDI FIT - ROUBO E FURTO</option>
+                            <option value="RESIDENCIAL">IMOBILIARIA</option>
+                            <option value="AUTOMÓVEL">MAPFRE NÁUTICO</option>
+                            <option value="OUTROS">MOBI LIVRE</option>
+                            <option value="AUTOMÓVEL">MOTO</option>
+                            <option value="AUTOMÓVEL">NAUTICA</option>
+                            <option value="OUTROS">ODONTOLÓGICO</option>
+                            <option value="OUTROS">PENHOR RURAL</option>
+                            <option value="OUTROS">PESSOAS INDIVIDUAL - CONSÓRCIO</option>
+                            <option value="OUTROS">PESSOAS INDIVIDUAL - VIAGEM</option>
+                            <option value="OUTROS">PORTO CAPITALIZAÇÃO</option>
+                            <option value="OUTROS">PREVIDENCIA</option>
+                            <option value="OUTROS">PREVIDENCIA INDIVIDUAL</option>
+                            <option value="RESIDENCIAL">PROPRIEDADES RURAIS</option>
+                            <option value="OUTROS">R C DO CONDUTOR DURANTE A MOBILIDADE INDIVIDUAL</option>
+                            <option value="RESIDENCIAL">RESIDENCIAL</option>
+                            <option value="RESIDENCIAL">RESIDENCIAL DUO</option>
+                            <option value="OUTROS">RESPONSABILIDADE CIVIL - PROFISSIONAL</option>
+                            <option value="OUTROS">RESPONSABILIDADES - RC GERAL</option>
+                            <option value="OUTROS">RESPONSABILIDADES - RC PROFISSIONAL</option>
+                            <option value="OUTROS">RISCO DE ENGENHARIA</option>
+                            <option value="OUTROS">RISCOS FINANCEIROS - GARANTIA SEGURADO - SETOR PRI</option>
+                            <option value="OUTROS">RISCOS FINANCEIROS - GARANTIA SEGURADO - SETOR PÚB</option>
+                            <option value="OUTROS">SAÚDE</option>
+                            <option value="OUTROS">SEGURO VIAGEM</option>
+                            <option value="OUTROS">TRANSPORTE - RCF-DC</option>
+                            <option value="OUTROS">TRANSPORTE - RCTR-C</option>
+                            <option value="OUTROS">TRANSPORTES - EMBARCADOR</option>
+                            <option value="OUTROS">VIDA EM GRUPO</option>
+                            <option value="OUTROS">VIDA INDIVIDUAL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-limpar" onclick="limparFormularioSinistralidade()">
+                        <i class="fa-solid fa-eraser"></i> Limpar
+                    </button>
+                    <button type="button" class="btn btn-processar" onclick="gerarPDF_sinistralidade()">
+                        <i class="fa-solid fa-file-pdf"></i> Gerar PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 3: CONTRATO DE COMPRA E VENDA -->
+    <div class="form-section hidden" id="tab-compra">
+        <div class="header-section" onclick="toggleSection(this)">
+            <div class="header-title">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <span>Contrato de Compra e Venda de Veículo</span>
+            </div>
+        </div>
+        <div class="form-content">
+            <form id="formulario">
+                <h3 style="margin-bottom: 15px; color: #4a6675;">Dados do Comprador</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Comprador <span class="required">*</span></label>
+                        <input type="text" id="comprador_nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF/CNPJ <span class="required">*</span></label>
+                        <input type="text" id="comprador_cpf" maxlength="18" oninput="formatarCPFouCNPJ(this)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <input type="text" id="comprador_cep" maxlength="8" placeholder="Somente números" onblur="buscarEndereco('comprador')">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Logradouro</label>
+                        <input type="text" id="comprador_logradouro">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="comprador_numero">
+                    </div>
+                    <div class="form-group">
+                        <label>Bairro</label>
+                        <input type="text" id="comprador_bairro">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" id="comprador_cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>UF</label>
+                        <input type="text" id="comprador_uf" maxlength="2">
+                    </div>
+                </div>
+
+                <h3 style="margin: 25px 0 15px; color: #4a6675;">Dados do Vendedor</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome do Vendedor <span class="required">*</span></label>
+                        <input type="text" id="vendedor_nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF/CNPJ <span class="required">*</span></label>
+                        <input type="text" id="vendedor_cpf" maxlength="18" oninput="formatarCPFouCNPJ(this)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <input type="text" id="vendedor_cep" maxlength="8" placeholder="Somente números" onblur="buscarEndereco('vendedor')">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Logradouro</label>
+                        <input type="text" id="vendedor_logradouro">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="vendedor_numero">
+                    </div>
+                    <div class="form-group">
+                        <label>Bairro</label>
+                        <input type="text" id="vendedor_bairro">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" id="vendedor_cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>UF</label>
+                        <input type="text" id="vendedor_uf" maxlength="2">
+                    </div>
+                </div>
+
+                <h3 style="margin: 25px 0 15px; color: #4a6675;">Dados do Veículo</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marca <span class="required">*</span></label>
+                        <input type="text" id="veiculo_marca" placeholder="Ex: Volkswagen - Gol 1.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ano <span class="required">*</span></label>
+                        <input type="number" id="veiculo_ano" min="1900" placeholder="2022" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Modelo <span class="required">*</span></label>
+                        <input type="number" id="veiculo_modelo" min="1900" placeholder="2022" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Placa <span class="required">*</span></label>
+                        <input type="text" id="veiculo_placa" maxlength="8" oninput="formatarPlaca(this)" placeholder="AAA-1A23" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Chassi <span class="required">*</span></label>
+                        <input type="text" id="veiculo_chassi" maxlength="19" required>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-limpar" onclick="limparFormularioCompra()">
+                        <i class="fa-solid fa-eraser"></i> Limpar
+                    </button>
+                    <button type="button" class="btn btn-processar" onclick="gerarPDF_compra()">
+                        <i class="fa-solid fa-file-pdf"></i> Gerar PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SEÇÃO 4: MENSAGEM RESTITUIÇÃO -->
+    <div class="form-section hidden" id="tab-mensagem">
+        <div class="header-section" onclick="toggleSection(this)">
+            <div class="header-title">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <span>Mensagem de Restituição</span>
+            </div>
+        </div>
+        <div class="form-content">
+            <div class="message-box">
+                <div class="form-group">
+                    <label>Data do Endosso <span class="required">*</span></label>
+                    <input type="date" id="dataBase" onchange="validarECalcular()" onblur="validarECalcular()" required>
+                </div>
+                
+                <div class="message-display" id="msgrestituicao">
+                    Olá! Tudo bem? 😊<br>
+                    Quero te avisar que a sua restituição está prevista para acontecer no dia *dd/mm/yyyy*.<br><br>
+                    Se por algum motivo ela não for realizada até essa data, pode me chamar aqui no WhatsApp para que façamos a verificação com a cia!<br><br>
+                    Estou à disposição!💙
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-processar" id="btnCopiar" onclick="copiarConteudo()">
+                        <i class="fa-solid fa-copy"></i> Copiar Mensagem
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle de seções
+function toggleSection(header) {
+    const section = header.parentElement;
+    section.classList.toggle('fechado');
+}
+
+// Sistema de tabs
+const tabsRamos = document.querySelectorAll(".tab-ramo");
+tabsRamos.forEach(tab => {
+    tab.addEventListener("click", () => {
+        const target = tab.getAttribute("data-tab");
+        
+        // Remove active de todas as tabs
+        tabsRamos.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        
+        // Esconde todas as seções
+        document.querySelectorAll(".form-section").forEach(section => {
+            section.classList.add("hidden");
+        });
+        
+        // Mostra a seção correspondente
+        document.getElementById("tab-" + target).classList.remove("hidden");
+    });
+});
+
+// Sistema de Parâmetros URL para preencher campos automaticamente
+window.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Parâmetros disponíveis
+    const aba = urlParams.get('aba');
+    const nome = urlParams.get('nome');
+    const cpf = urlParams.get('cpf');
+    const apolice = urlParams.get('apolice');
+    const proposta = urlParams.get('proposta');
+    const seguradora = urlParams.get('seguradora');
+    const tipo = urlParams.get('tipo');
+    
+    console.log(nome)
+    console.log(cpf)
+    console.log(apolice)
+    console.log(proposta)
+    console.log(seguradora)
+    console.log(tipo)
+    
+    // Se tem aba especificada, abre ela
+    if (aba) {
+        // Remove active de todas as tabs
+        tabsRamos.forEach(t => t.classList.remove('active'));
+        
+        // Esconde todas as seções
+        document.querySelectorAll('.form-section').forEach(s => s.classList.add('hidden'));
+        
+        // Ativa a tab correspondente
+        const tab = document.querySelector(`[data-tab="${aba}"]`);
+        if (tab) {
+            tab.classList.add('active');
+            document.getElementById('tab-' + aba).classList.remove('hidden');
+        }
+    }
+    
+    // Preenche campos conforme a aba
+    if (aba === 'cancelamento') {
+        if (nome) document.getElementById('nome_cancelamento').value = decodeURIComponent(nome);
+        if (cpf) {
+            const cpfInput = document.getElementById('segurado_cpf_cancelamento');
+            cpfInput.value = decodeURIComponent(cpf);
+            formatarCPFouCNPJ(cpfInput);
+        }
+        if (apolice || proposta) {
+            document.getElementById('apolice_cancelamento').value = decodeURIComponent(apolice || proposta);
+        }
+        if (seguradora) document.getElementById('seguradora_cancelamento').value = decodeURIComponent(seguradora);
+        if (tipo) {
+            document.getElementById('tipoSeguro_cancelamento').value = decodeURIComponent(tipo);
+            mostrarCampos();
+        }
+        validarFormulario();
+        
+    } else if (aba === 'sinistralidade') {
+        if (nome) document.getElementById('nome_sinistralidade').value = decodeURIComponent(nome);
+        if (apolice || proposta) {
+            document.getElementById('apolice_sinistralidade').value = decodeURIComponent(apolice || proposta);
+        }
+        if (seguradora) document.getElementById('seguradora_sinistralidade').value = decodeURIComponent(seguradora);
+        if (tipo) document.getElementById('tipoSeguro_sinistralidade').value = decodeURIComponent(tipo);
+        
+    } else if (aba === 'compra') {
+        // Em compra e venda, preenche dados do COMPRADOR com os dados do segurado
+        if (nome) document.getElementById('comprador_nome').value = decodeURIComponent(nome);
+        if (cpf) {
+            const cpfInput = document.getElementById('comprador_cpf');
+            cpfInput.value = decodeURIComponent(cpf);
+            formatarCPFouCNPJ(cpfInput);
+        }
+    }
+});
+
+// Funções de formatação
+function formatarCPFouCNPJ(input) {
+    let valor = input.value.replace(/\D/g, '');
+    if (valor.length > 11) {
+        input.value = valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d)/, '$1.$2.$3/$4-$5');
+    } else {
+        input.value = valor.replace(/(\d{3})(\d{3})(\d{3})(\d)/, '$1.$2.$3-$4');
+    }
+}
+
+function formatarPlaca(input) {
+    let valor = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (valor.length <= 7) {
+        input.value = valor.replace(/^([A-Z]{3})(\d)([A-Z0-9])(\d{2})$/, '$1-$2$3$4');
+    } else {
+        input.value = valor.slice(0, 3) + '-' + valor.slice(3, 7);
+    }
+}
+
+function formatarData(dataStr) {
+    const [ano, mes, dia] = dataStr.split("-").map(Number);
+    const data = new Date(Date.UTC(ano, mes - 1, dia));
+    const meses = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+    ];
+    return `${data.getUTCDate()} de ${meses[data.getUTCMonth()].toUpperCase()} de ${data.getUTCFullYear()}`;
+}
+
+// Inicialização de datas
+function dataAtualFormatada() {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+}
+
+document.getElementById("dataSolicitacao_cancelamento").value = dataAtualFormatada();
+document.getElementById("dataSolicitacao_sinistralidade").value = dataAtualFormatada();
+document.getElementById('dataBase').value = dataAtualFormatada();
+
+// Validação de formulário de cancelamento
+function validarFormulario() {
+    const form = document.getElementById("formularioSeguro");
+    const botaoGerar = document.getElementById("botaoGerarPdf_cancelamento");
+    botaoGerar.disabled = !form.checkValidity();
+}
+
+document.querySelectorAll("input, select").forEach(input => {
+    input.addEventListener("input", validarFormulario);
+});
+
+// Mostrar campos específicos
+function mostrarCampos() {
+    const tipo = document.getElementById("tipoSeguro_cancelamento").value;
+    document.getElementById("camposAutomovel").classList.add("hidden");
+    document.getElementById("camposResidencial").classList.add("hidden");
+
+    if (tipo === "AUTOMÓVEL") {
+        document.getElementById("camposAutomovel").classList.remove("hidden");
+    } else if (tipo === "RESIDENCIAL") {
+        document.getElementById("camposResidencial").classList.remove("hidden");
+    }
+    validarFormulario();
+}
+
+// Buscar CEP
+async function buscarCep() {
+    const cep = document.getElementById("cep").value.replace("-", "");
+    if (cep.length === 8) {
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await response.json();
+            if (!data.erro) {
+                document.getElementById("logradouro").value = data.logradouro || "";
+                document.getElementById("bairro").value = data.bairro || "";
+                document.getElementById("cidade").value = data.localidade || "";
+                document.getElementById("estado").value = data.uf || "";
+                
+                if (document.getElementById("logradouro").value.trim() == "" && 
+                    document.getElementById("estado").value.trim() != "" && 
+                    document.getElementById("cidade").value.trim() != "") {
+                    document.getElementById("logradouro").disabled = false;   
+                    document.getElementById("bairro").disabled = false;
+                } else {
+                    document.getElementById("logradouro").disabled = true;   
+                    document.getElementById("bairro").disabled = true;                    
+                }
+            } else {
+                alert("CEP não encontrado!");
+            }
+        } catch (error) {
+            alert("Erro ao buscar CEP.");
+        }
+    }
+}
+
+async function buscarEndereco(tipo) {
+    const cep = document.getElementById(`${tipo}_cep`).value;
+    if (cep.length !== 8) return;
+
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+            document.getElementById(`${tipo}_logradouro`).value = data.logradouro;
+            document.getElementById(`${tipo}_cidade`).value = data.localidade;
+            document.getElementById(`${tipo}_bairro`).value = data.bairro;
+            document.getElementById(`${tipo}_uf`).value = data.uf;
+        } else {
+            alert("CEP não encontrado!");
+        }
+    } catch (error) {
+        alert("Erro ao buscar o endereço.");
+    }
+}
+
+// Funções de limpeza
+function limparFormularioCancelamento() {
+    document.getElementById("formularioSeguro").reset();
+    document.getElementById("camposAutomovel").classList.add("hidden");
+    document.getElementById("camposResidencial").classList.add("hidden");
+    document.getElementById("dataSolicitacao_cancelamento").value = dataAtualFormatada();
+    validarFormulario();
+}
+
+function limparFormularioSinistralidade() {
+    document.getElementById("formularioSeguro_sinistralidade").reset();
+    document.getElementById("dataSolicitacao_sinistralidade").value = dataAtualFormatada();
+}
+
+function limparFormularioCompra() {
+    document.getElementById("formulario").reset();
+}
+
+// Mensagem de restituição
+validarECalcular();
+
+function validarECalcular() {
+    const input = document.getElementById("dataBase");
+    const valor = input.value;
+
+    if (!valor || isNaN(new Date(valor).getTime())) {
+        return;
+    }
+
+    let data = new Date(valor);
+    data.setDate(data.getDate() + 10);
+    const dataMais10 = data.toISOString().split("T")[0];
+    criamensagem(dataMais10);
+}
+
+function criamensagem(data) {
+    const data_formatada = data.split('-').reverse().join('/');
+    const msgrest = document.getElementById('msgrestituicao');
+    msgrest.innerHTML = `Olá! Tudo bem? 😊<br>Quero te avisar que a sua restituição está prevista para acontecer no dia *${data_formatada}*.<br><br>Se por algum motivo ela não for realizada até essa data, pode me chamar aqui no WhatsApp para que façamos a verificação com a cia!<br><br>Estou à disposição!💙`;
+}
+
+function copiarConteudo() {
+    const div = document.getElementById("msgrestituicao");
+    const btn = document.getElementById("btnCopiar");
+    const textoOriginal = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Copiando...';
+
+    let texto = div.innerHTML.replace(/<br\s*\/?>/gi, "\n");
+
+    navigator.clipboard.writeText(texto)
+        .then(() => {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+            setTimeout(() => {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }, 2000);
+        })
+        .catch(err => {
+            btn.innerHTML = '<i class="fa-solid fa-times"></i> Erro!';
+            console.error(err);
+            setTimeout(() => {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }, 2000);
+        });
+}
+
+// Funções de geração de PDF (mantendo as originais)
+function gerarPDF_cancelamento() {
+    const tipoSeguro = document.getElementById("tipoSeguro_cancelamento").value;
+    const nome = document.getElementById("nome_cancelamento").value;
+    const cpf = document.getElementById("segurado_cpf_cancelamento").value;
+    const apolice = document.getElementById("apolice_cancelamento").value;
+    const seguradora_valor = document.getElementById('seguradora_cancelamento').value;
+    const corretora = document.getElementById('nome_corretora').value;
+    const dataSelecionada = document.getElementById('dataSolicitacao_cancelamento').value;
+
+    if (nome.split(" ").length < 2) {
+        alert("Por favor, informe o nome completo do segurado.");
+        return false;
+    }
+
+    if (!corretora) {
+        alert("Por favor, informe o nome da corretora.");
+        return false;
+    }
+
+    if (!dataSelecionada) {
+        alert('Por favor informe a data de solicitação do cancelamento.');
+        return false;
+    }
+
+    const dataFormatada = formatarData(dataSelecionada);
+    let texto_solicitacao;
+
+    if (tipoSeguro === "AUTOMÓVEL") {
+        const fabricanteModelo = document.getElementById("fabricanteModelo").value;
+        const chassi = document.getElementById("chassi").value;
+        
+        if (!fabricanteModelo || !chassi) {
+            alert("Por favor, preencha o fabricante e chassi do veículo.");
+            return false;
+        }
+        texto_solicitacao = "Pelo presente, venho solicitar de V.S.as a gentileza de providenciarem o CANCELAMENTO de minha apólice de seguros, referente ao veículo abaixo informado.";
+    } else if (tipoSeguro === "RESIDENCIAL") {
+        const cep = document.getElementById("cep").value;
+        const numero = document.getElementById("numero").value;
+        const logradouro = document.getElementById("logradouro").value;
+        
+        if (!cep || !numero || !logradouro) {
+            alert("Por favor, preencha os dados do endereço.");
+            return false;
+        }
+        texto_solicitacao = "Pelo presente, venho solicitar de V.S.as a gentileza de providenciarem o CANCELAMENTO de minha apólice de seguros, referente ao endereço abaixo informado.";
+    } else {
+        texto_solicitacao = "Pelo presente, venho solicitar de V.S.as a gentileza de providenciarem o CANCELAMENTO de minha apólice de seguros, referente ao ramo abaixo informado.";
+    }
+
+    let docDefinition = {
+        content: [
+            { text: ['A ', seguradora_valor.toUpperCase(), '/ ,corretora.toUpperCase(),'.\n\n\n\n'], alignment: 'left' },
+            { text: ['Ref. a Proposta/Apólice Nº: ', {text: apolice, bold: true}, '\n']},
+            { text: '', margin: [0, 3, 0, 3], alignment: 'justify'},
+            { text: ['Segurado: ', {text: nome.toUpperCase(), bold: true}, '\n']},
+            { text: '', margin: [0, 3, 0, 3], alignment: 'justify'},
+            { text: ['CPF/CNPJ: ', {text: cpf, bold: true}, '\n\n']},
+            { text: '', margin: [0, 3, 0, 3], alignment: 'justify'},
+            { text: 'Prezados Senhores,\n\n\n', style: 'header' },
+            { text: texto_solicitacao },
+            { text: '', margin: [0, 3, 0, 3], alignment: 'justify'},
+        ],
+        styles: {
+            header: { fontSize: 12, bold: true },
+            tableExample: { margin: [0, 5, 0, 15] }
+        }
+    };
+
+    // Adicionar campos específicos conforme o tipo
+    if (tipoSeguro === "AUTOMÓVEL") {
+        const fabricanteModelo = document.getElementById("fabricanteModelo").value;
+        const ano = document.getElementById("ano").value;
+        const modelo = document.getElementById("modelo").value;
+        const placa = document.getElementById("placa").value;
+        const chassi = document.getElementById("chassi").value;
+        const bonus = document.getElementById("bonus").value;
+
+        docDefinition.content.push({
+            style: 'tableExample',
+            table: {
+                widths: ['*'],
+                body: [[{
+                    text: [
+                        {text: 'Fabricante/Modelo: ', bold: true}, {text: fabricanteModelo}, ' ',
+                        ...(fabricanteModelo.length > 30 ? ['\n'] : []),
+                        ...(ano ? [{text:'Ano - Modelo: ', bold: true}, ' ', {text: ano + ' - ' + modelo}] : ['']), '\n',
+                        ...(placa ? [{text: 'Placa: ', bold: true}, {text: placa}] : ['']), ' ',
+                        ...(bonus ? [{text: 'Bônus: ', bold: true}, bonus] : ['']), '\n',
+                        ...(chassi ? [{text: 'Chassi/Nº Série:', bold: true}, chassi] : [''])
+                    ]
+                }]]
+            },
+            layout: {
+                hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 1 : 0,
+                vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length) ? 1 : 0,
+                hLineColor: () => 'black',
+                vLineColor: () => 'black',
+                paddingLeft: () => 4,
+                paddingRight: () => 4,
+                paddingTop: () => 4,
+                paddingBottom: () => 4
+            }
+        });
+    } else if (tipoSeguro === "RESIDENCIAL") {
+        const cep = document.getElementById("cep").value;
+        const logradouro = document.getElementById("logradouro").value;
+        const bairro = document.getElementById("bairro").value;
+        const cidade = document.getElementById("cidade").value;
+        const estado = document.getElementById("estado").value;
+        const numero = document.getElementById("numero").value;
+        const complemento = document.getElementById("complemento").value;
+
+        docDefinition.content.push({
+            style: 'tableExample',
+            table: {
+                widths: ['*'],
+                body: [[{
+                    text: [
+                        ...(cep ? [{text: 'CEP: '}, {text: cep, bold: true}] : []), ' ',
+                        ...(logradouro ? [{text: 'Logradouro: '}, {text: logradouro, bold: true}] : []), ' ',
+                        ...(numero ? [{text: 'Número: '}, {text: numero, bold: true}, '\n'] : []),
+                        ...(complemento ? [{text: 'Complemento: '}, {text: complemento, bold: true}] : []), ' ',
+                        ...(bairro ? [{text: 'Bairro: '}, {text: bairro, bold: true}] : []), ' ',
+                        ...(cidade ? [{text: 'Cidade: '}, {text: cidade, bold: true}] : []), ' ',
+                        ...(estado ? [{text: 'Estado: '}, {text: estado, bold: true}] : [])
+                    ],
+                    alignment: 'justify'
+                }]]
+            },
+            layout: {
+                hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 1 : 0,
+                vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length) ? 1 : 0,
+                hLineColor: () => 'black',
+                vLineColor: () => 'black',
+                paddingLeft: () => 4,
+                paddingRight: () => 4,
+                paddingTop: () => 4,
+                paddingBottom: () => 4
+            }
+        });
+    } else {
+        const select = document.getElementById('tipoSeguro_cancelamento');
+        const tipodeseguro = select.options[select.selectedIndex].text;
+        
+        docDefinition.content.push({
+            table: {
+                widths: ['*'],
+                body: [[{
+                    text: [{text: 'Ramo:'}, {text: tipodeseguro, bold: true}]
+                }]]
+            },
+            layout: {
+                hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 1 : 0,
+                vLineWidth: (i, node) => (i === 0 || i === node.table.widths.length) ? 1 : 0,
+                hLineColor: () => 'black',
+                vLineColor: () => 'black',
+                paddingLeft: () => 4,
+                paddingRight: () => 4,
+                paddingTop: () => 4,
+                paddingBottom: () => 4
+            }
+        });
+    }
+
+    // Assinatura
+    docDefinition.content.push(
+        { text: '\nDeclaro que todas as informações aqui prestadas são verdadeiras e completas.\n\n' },
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: 'PARÁ DE MINAS, ' + dataFormatada, alignment: 'center' }]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '_______________________________________________________', alignment: 'center', margin: [0, 30, 0, 0] }]},
+        { columns: [{ text: nome, alignment: 'center', bold: true }]},
+        { columns: [{ text: cpf, alignment: 'center', bold: true }]}
+    );
+
+    pdfMake.createPdf(docDefinition).download(`Cancelamento_${nome}.pdf`);
+}
+
+function gerarPDF_sinistralidade() {
+    const nome = document.getElementById("nome_sinistralidade").value;
+    const apolice = document.getElementById("apolice_sinistralidade").value;
+    const endosso = document.getElementById("endosso_sinistralidade").value;
+    const dataSelecionada = document.getElementById('dataSolicitacao_sinistralidade').value;
+    const seguradora_valor = document.getElementById('seguradora_sinistralidade').value;
+    const select = document.getElementById('tipoSeguro_sinistralidade');
+    const tipoSeguro = select.value;
+
+    if (nome.split(" ").length < 2) {
+        alert("Por favor, informe o nome completo do segurado.");
+        return false;
+    }
+
+    if (!dataSelecionada) {
+        alert('Por favor informe a data de solicitação.');
+        return false;
+    }
+
+    const dataFormatada = formatarData(dataSelecionada);
+    const texto_solicitacao = `Solicito o restabelecimento da cobertura relativa à apólice ou endosso acima, sem que seja realizada a vistoria e/ou inspeção dos bens ou interessses seguráveis.\n\nPara tanto, declaro estar ciente e aceito, que a ${seguradora_valor} estará isenta da responsabilidade do pagamento de indenização ou despesa, referente a evento ocorrido durante o período em que a cobertura esteve suspensa, ainda que a reclamação venha a ser apresentada após a regularização do débito.\n\nA presente declaração está sendo por mim feita livremente e por ela me responsabilizo civil e penalmente.`;
+
+    let docDefinition = {
+        content: [
+            { text: ['À \n', seguradora_valor.toUpperCase(), '\n\n\n\n'], alignment: 'left' },
+            { text: ['SEGURADO: ', {text: nome.toUpperCase(), bold: true}, '\n']},
+            { text: ['RAMO: ', {text: tipoSeguro.toUpperCase(), bold: true}, '\n']},
+            { text: ['APÓLICE Nº: ', {text: apolice, bold: true}, '\n']},
+            { text: ['ENDOSSO Nº: ', {text: endosso, bold: true}, '\n']},
+            { text: '', margin: [0, 3, 0, 3], alignment: 'justify'},
+            { text: 'Prezados Senhores,\n\n\n', style: 'header' },
+            { text: texto_solicitacao, margin: [0, 3, 0, 3], alignment: 'justify'},
+        ],
+        styles: {
+            header: { fontSize: 12, bold: true }
+        }
+    };
+
+    docDefinition.content.push(
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: 'PARÁ DE MINAS, ' + dataFormatada, alignment: 'center' }]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '', margin: [0, 10, 0, 10], alignment: 'justify'}]},
+        { columns: [{ text: '_______________________________________________________', alignment: 'center', margin: [0, 30, 0, 0] }]},
+        { columns: [{ text: nome, alignment: 'center', bold: true }]}
+    );
+
+    pdfMake.createPdf(docDefinition).download(`Carta_nao_Sinistralidade_${nome}.pdf`);
+}
+
+function formatarDataAtual() {
+    const data = new Date();
+    const dia = data.getDate();
+    const meses = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+    ];
+    const mes = meses[data.getMonth()];
+    const ano = data.getFullYear();
+    return `${dia} de ${mes.toUpperCase()} de ${ano}`;
+}
+
+function gerarPDF_compra() {
+    const comprador = {
+        nome: document.getElementById("comprador_nome").value,
+        cep: document.getElementById("comprador_cep").value,
+        logradouro: document.getElementById("comprador_logradouro").value,
+        bairro: document.getElementById("comprador_bairro").value,
+        cidade: document.getElementById("comprador_cidade").value,
+        uf: document.getElementById("comprador_uf").value,
+        numero: document.getElementById("comprador_numero").value,
+        cpf: document.getElementById("comprador_cpf").value,
+    };
+    
+    const vendedor = {
+        nome: document.getElementById("vendedor_nome").value,
+        cep: document.getElementById("vendedor_cep").value,
+        logradouro: document.getElementById("vendedor_logradouro").value,
+        cidade: document.getElementById("vendedor_cidade").value,
+        bairro: document.getElementById("vendedor_bairro").value,
+        uf: document.getElementById("vendedor_uf").value,
+        numero: document.getElementById("vendedor_numero").value,
+        cpf: document.getElementById("vendedor_cpf").value,
+    };
+    
+    const veiculo = {
+        marca: document.getElementById("veiculo_marca").value,
+        ano: document.getElementById("veiculo_ano").value,
+        modelo: document.getElementById("veiculo_modelo").value,
+        placa: document.getElementById("veiculo_placa").value,
+        chassi: document.getElementById("veiculo_chassi").value,
+    };
+
+    if (vendedor.nome.split(" ").length < 2) {
+        alert("Por favor, informe o nome completo do vendedor.");
+        return false;
+    }
+    
+    if (comprador.nome.split(" ").length < 2) {
+        alert("Por favor, informe o nome completo do comprador.");
+        return false;
+    }
+
+    if (!vendedor.nome || !vendedor.cpf || !comprador.nome || !comprador.cpf || 
+        !veiculo.marca || !veiculo.ano || !veiculo.modelo || !veiculo.placa || !veiculo.chassi) {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return false;
+    }
+
+    const tipoDocumentovendedor = vendedor.cpf.length === 14 ? 'CPF' : 'CNPJ';
+    const tipoDocumentocomprador = comprador.cpf.length === 14 ? 'CPF' : 'CNPJ';
+    const localizadovendedor = tipoDocumentovendedor === 'CPF' ? 'residente na' : 'sediada na';
+    const localizadocomprador = tipoDocumentocomprador === 'CPF' ? 'residente na' : 'sediada na';
+
+    const docDefinition = {
+        pageMargins: [80, 60, 80, 60],
+        content: [
+            { text: "CONTRATO PARTICULAR DE COMPRA E VENDA", style: "header", alignment: "center" },
+            { text: "", margin: [0, 10, 0, 10], alignment: 'justify'},
+            {
+                text: [
+                    'Pelo presente instrumento de contrato de compra e venda, na condição de vendedor ',
+                    { text: vendedor.nome.toUpperCase(), bold: true },
+                    `, ${tipoDocumentovendedor}:`, {text: vendedor.cpf, bold: true},
+                    ...(vendedor.cep ? [`${localizadovendedor} `, {text: vendedor.logradouro, bold: true}, ', ', {text: vendedor.numero, bold: true}, `. Bairro:`, {text: vendedor.bairro, bold: true}, `, `, {text: vendedor.cidade, bold: true}, {text: ` - `, bold: true}, {text: vendedor.uf, bold: true}, `. `, `CEP: `, {text: vendedor.cep, bold: true}, `,`] : []),
+                    ' e na condição de comprador ', { text: comprador.nome.toUpperCase(), bold: true }, `, ${tipoDocumentocomprador}:`, {text: comprador.cpf, bold: true},
+                    ...(comprador.cep ? [` ${localizadocomprador} `, {text: comprador.logradouro, bold: true}, {text: `, `, bold: true}, {text: comprador.numero, bold: true}, `. Bairro: `, {text: comprador.bairro, bold: true}, {text: `, `, bold: true}, {text: comprador.cidade, bold: true}, {text: ` - `, bold: true}, {text: comprador.uf, bold: true}, {text: `, `, bold: true}, `CEP: `, {text: comprador.cep, bold: true}] : []),
+                    ' acertam o seguinte:'
+                ],
+                alignment: 'justify'
+            },
+            {
+                text: 'O vendedor vende e o comprador adquire, pelo presente contrato, o veículo com as seguintes características:',
+                margin: [0, 10, 0, 10],
+                alignment: 'justify'
+            },
+            {
+                text: [
+                    { text: 'MARCA: '},
+                    { text: veiculo.marca.toUpperCase(), bold: true},
+                    { text: ' ANO/MODELO: '},
+                    { text: `${veiculo.ano} - ${veiculo.modelo} - `, bold: true},
+                    { text: 'PLACA: '},
+                    { text: veiculo.placa.toUpperCase(), bold: true},
+                    { text: ', CHASSI: '},
+                    { text: veiculo.chassi, bold: true}
+                ],
+                alignment: 'justify'
+            },
+            {
+                text: "Para que possa produzir todos os seus efeitos civis ou criminais, as partes firmam o presente contrato.",
+                margin: [0, 10, 0, 10],
+                alignment: 'justify'
+            },
+            { text: "", alignment: 'center', margin: [0, 10, 0, 10]},
+            {
+                text: [
+                    ...(vendedor.cidade ? [vendedor.cidade.toUpperCase() + ', ' + formatarDataAtual()] : ['PARÁ DE MINAS, ' + formatarDataAtual()]),
+                ],
+                alignment: 'center',
+                margin: [0, 20, 0, 10]
+            },
+            { text: "", alignment: 'center', margin: [0, 20, 0, 10]},
+            { text: "", alignment: 'center', margin: [0, 20, 0, 10]},
+            { text: "", alignment: 'center', margin: [0, 20, 0, 10]},
+            { text: "", alignment: 'center', margin: [0, 20, 0, 10]},
+            { text: "", alignment: 'center', margin: [0, 20, 0, 10]},
+            { text: "", alignment: 'center', margin: [0, 20, 0, 10]},
+            {
+                columns: [
+                    [
+                        {text: '_____________________________________', alignment: 'center', margin: [0, 20, 0, 0]},
+                        { text: `${vendedor.nome.toUpperCase()}`, bold: true, alignment: 'center', style: "subscript"},
+                        { text: ` ${tipoDocumentovendedor}: ${vendedor.cpf}`, bold: true, alignment: 'center', style: "subscript"}
+                    ],
+                    [
+                        {text: '_____________________________________', alignment: 'center', margin: [0, 20, 0, 0]},
+                        { text: `${comprador.nome.toUpperCase()}`, bold: true, alignment: 'center', style: "subscript"},
+                        { text: `${tipoDocumentocomprador}: ${comprador.cpf}`, bold: true, alignment: 'center', style: "subscript"}
+                    ]
+                ]
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 16,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            },
+            subscript: {
+                fontSize: 8,
+                margin: [0, 2, 0, 2]
+            }
+        },
+        defaultStyle: {
+            fontSize: 12,
+            lineHeight: 1.5
+        }
+    };
+
+    pdfMake.createPdf(docDefinition).download('Contrato_compra_e_venda_' + vendedor.nome + '.pdf');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inserir Página em PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            font-size: 13px;
+            margin: 5px;
+        }
+
+        .main-content { background-color: white; margin: 0; }
+
+        .tabs-ramos {
+            display: flex;
+            gap: 5px;
+            margin: 10px 20px 0 20px;
+        }
+
+        .tab-ramo {
+            padding: 6px 14px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+
+        .tab-ramo.active {
+            background-color: #4a6675;
+            color: white;
+            border-color: #3d5560;
+        }
+
+        .tab-ramo:hover:not(.active) { background-color: #e6e6e6; }
+
+        /* Painéis de modo */
+        .modo-panel { display: none; }
+        .modo-panel.active { display: block; }
+
+        .form-section {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            margin: 20px;
+        }
+
+        .header-section {
+            background-color: #4a6675;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .header-title { font-size: 14px; }
+
+        .header-icon {
+            transition: transform 0.2s ease;
+            font-size: 13px;
+        }
+
+        .form-section.fechado .header-icon { transform: rotate(-90deg); }
+
+        .form-row {
+            gap: 15px;
+            margin-bottom: 15px;
+            width: calc(100% - 5px);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin: 20px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            background-color: white;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #66afe9;
+            box-shadow: 0 0 3px rgba(102,175,233,0.5);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+
+        .radio-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #fafafa;
+            margin: 0 20px 20px 20px;
+        }
+
+        .radio-section-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .radio-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .radio-item { display: flex; align-items: center; gap: 6px; }
+        .radio-item input[type="radio"] { width: 14px; height: 14px; margin: 0; }
+        .radio-item label { font-size: 12px; margin: 0; cursor: pointer; }
+
+        .upload-area {
+            border: 2px dashed #999;
+            background-color: #fafafa;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .upload-area:hover { border-color: #5bc0de; background-color: #f0f8ff; }
+        .upload-area.active { border-color: #5bc0de; background-color: #e8f4f8; }
+        .upload-area p { font-size: 12px; color: #666; margin: 5px 0; }
+
+        input[type="file"] { display: none; }
+
+        .file-selected {
+            display: none;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #d9edf7;
+            border-left: 3px solid #5bc0de;
+            font-size: 12px;
+            color: #31708f;
+        }
+
+        .file-selected.show { display: block; }
+
+        .preview-box {
+            padding: 12px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            margin: 0 20px 20px 20px;
+        }
+
+        .preview-box h4 {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .alert {
+            padding: 10px 12px;
+            margin: 15px 20px;
+            border-left: 4px solid;
+            font-size: 12px;
+            display: none;
+        }
+
+        .alert.show { display: block; }
+        .alert.success { background-color: #dff0d8; border-color: #5cb85c; color: #3c763d; }
+        .alert.error { background-color: #f2dede; border-color: #d9534f; color: #a94442; }
+        .alert.info { background-color: #d9edf7; border-color: #5bc0de; color: #31708f; }
+
+        .loading {
+            display: none;
+            margin: 10px 20px;
+            padding: 10px;
+            background-color: #fcf8e3;
+            border-left: 4px solid #f0ad4e;
+            font-size: 12px;
+            color: #8a6d3b;
+        }
+
+        .loading.show { display: block; }
+
+        .action-buttons {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 15px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+
+        .btn {
+            padding: 7px 20px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover:not(:disabled) { background-color: #f5f5f5; }
+
+        .btn-processar {
+            background-color: #5bc0de;
+            color: white;
+            border-color: #5bc0de;
+            font-weight: bold;
+        }
+
+        .btn-processar:hover:not(:disabled) { background-color: #46b8da; }
+
+        .btn-limpar {
+            background-color: #d9534f;
+            color: white;
+            border-color: #d9534f;
+        }
+
+        .btn-limpar:hover:not(:disabled) { background-color: #c9302c; }
+
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ===================== LOTE ===================== */
+
+        .lote-drop-zone {
+            border: 2px dashed #999;
+            background-color: #fafafa;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .lote-drop-zone:hover,
+        .lote-drop-zone.drag-over {
+            border-color: #5bc0de;
+            background-color: #f0f8ff;
+        }
+
+        .lote-drop-zone p { font-size: 12px; color: #666; margin: 5px 0; }
+        .lote-drop-zone i { font-size: 28px; color: #5bc0de; margin-bottom: 8px; display: block; }
+
+        .lote-lista {
+            margin-top: 12px;
+            max-height: 260px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        .lote-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            transition: background 0.15s;
+        }
+
+        .lote-item:last-child { border-bottom: none; }
+        .lote-item:nth-child(odd) { background-color: #fafafa; }
+
+        .lote-item-icon { color: #d9534f; font-size: 14px; flex-shrink: 0; }
+
+        .lote-item-nome {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lote-item-tamanho { color: #999; font-size: 11px; flex-shrink: 0; }
+
+        .lote-item-status {
+            font-size: 11px;
+            font-weight: bold;
+            flex-shrink: 0;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        .status-aguardando { color: #999; }
+        .status-processando { color: #f0ad4e; }
+        .status-ok { color: #5cb85c; }
+        .status-erro { color: #d9534f; }
+
+        .lote-item-remover {
+            cursor: pointer;
+            color: #999;
+            font-size: 12px;
+            flex-shrink: 0;
+            padding: 2px 4px;
+            transition: color 0.15s;
+        }
+
+        .lote-item-remover:hover { color: #d9534f; }
+
+        .lote-resumo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .lote-resumo strong { color: #333; }
+
+        .lote-imagem-preview {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin: 0 20px 20px 20px;
+            padding: 12px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+        }
+
+        .lote-imagem-preview img {
+            max-height: 120px;
+            max-width: 180px;
+            border: 1px solid #ccc;
+            flex-shrink: 0;
+        }
+
+        .lote-imagem-preview .lote-img-info { font-size: 12px; color: #555; }
+        .lote-imagem-preview .lote-img-info p { margin-bottom: 4px; }
+
+        .progress-bar-wrap {
+            background-color: #e9ecef;
+            border-radius: 3px;
+            height: 8px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #5bc0de;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .lote-tabs-ramo {
+            display: flex;
+            gap: 5px;
+            margin: 15px 20px 5px 20px;
+        }
+
+        .lote-tab {
+            padding: 5px 12px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .lote-tab.active {
+            background-color: #4a6675;
+            color: white;
+            border-color: #3d5560;
+        }
+
+        .lote-tab:hover:not(.active) { background-color: #e6e6e6; }
+
+        .btn-baixar-todos {
+            background-color: #5cb85c;
+            color: white;
+            border-color: #5cb85c;
+            font-weight: bold;
+        }
+
+        .btn-baixar-todos:hover:not(:disabled) { background-color: #4cae4c; }
+    </style>
+</head>
+<body>
+
+<div class="main-content">
+
+    <!-- ABAS PRINCIPAIS -->
+    <div class="tabs-ramos">
+        <div class="tab-ramo active" data-modo="auto">Automóvel</div>
+        <div class="tab-ramo" data-modo="demais">Demais Ramos</div>
+        <div class="tab-ramo" data-modo="lote"><i class="fa-solid fa-layer-group"></i> Em Lote</div>
+        <div class="tab-ramo" data-modo="conversor"><i class="fa-solid fa-image"></i> Conversor</div>
+    </div>
+
+    <!-- ========== MODO AUTOMÓVEL ========== -->
+    <div class="modo-panel active" id="panel-auto">
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Selecionar o PDF Base</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Arquivo PDF base</label>
+                    <div class="upload-area" id="uploadArea-auto">
+                        <p><i class="fa-solid fa-file-pdf"></i> <strong>Clique aqui</strong> ou arraste o arquivo PDF</p>
+                        <p style="font-size:10px;color:#999;">Formatos: .pdf | Máx: 50MB</p>
+                        <input type="file" id="pdfInput-auto" accept=".pdf">
+                    </div>
+                    <div class="file-selected" id="fileSelected-auto">
+                        <strong>Arquivo:</strong> <span id="fileName-auto"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section fechado">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Selecionar a Imagem Base64</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>Código Base64 da imagem (PNG ou JPEG)</label>
+                    <textarea id="imagemBase64-auto" placeholder="data:image/png;base64,iVBORw0KGgo..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Preview da Imagem Base64</div>
+            </div>
+            <div class="preview-box" style="margin:0 20px 20px 20px;">
+                <h4>Pré-visualização da imagem:</h4>
+                <img id="previewImg-auto" class="preview-image" style="display:none;" alt="Imagem">
+                <p id="noPreview-auto" style="text-align:center;color:#999;font-size:11px;padding:15px;">Aguardando código Base64 válido</p>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Configuração da Página</div>
+            </div>
+            <div class="radio-section">
+                <div class="radio-section-title">Configurações de inserção</div>
+                <div style="margin-bottom:15px;">
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Posição da nova página:</label>
+                    <div class="radio-columns">
+                        <div class="radio-item"><input type="radio" name="position-auto" id="posInicio-auto" value="start" checked><label for="posInicio-auto">Início do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-auto" id="posFinal-auto" value="end"><label for="posFinal-auto">Final do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-auto" id="posEspecifica-auto" value="custom"><label for="posEspecifica-auto">Posição específica</label></div>
+                    </div>
+                    <div id="customPos-auto" style="display:none;margin-top:10px;">
+                        <input type="number" id="pageNum-auto" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Tamanho da página:</label>
+                    <div class="radio-columns">
+                        <div class="radio-item"><input type="radio" name="pageSize-auto" id="sizeA4-auto" value="a4" checked><label for="sizeA4-auto">A4 (210 x 297 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-auto" id="sizeLetter-auto" value="letter"><label for="sizeLetter-auto">Carta (216 x 279 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-auto" id="sizeImg-auto" value="image"><label for="sizeImg-auto">Dimensão da imagem</label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert" id="alert-auto"></div>
+        <div class="loading" id="loading-auto"><i class="fa-solid fa-hourglass"></i> Processando documento... Aguarde.</div>
+
+        <div class="action-buttons">
+            <button class="btn btn-processar" id="btnProcessar-auto" disabled><i class="fa-solid fa-gear"></i> PROCESSAR PDF</button>
+            <button class="btn btn-limpar" id="btnLimpar-auto"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+        </div>
+    </div>
+
+    <!-- ========== MODO DEMAIS RAMOS ========== -->
+    <div class="modo-panel" id="panel-demais">
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Selecionar o PDF Base</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Arquivo PDF base</label>
+                    <div class="upload-area" id="uploadArea-demais">
+                        <p><i class="fa-solid fa-file-pdf"></i> <strong>Clique aqui</strong> ou arraste o arquivo PDF</p>
+                        <p style="font-size:10px;color:#999;">Formatos: .pdf | Máx: 50MB</p>
+                        <input type="file" id="pdfInput-demais" accept=".pdf">
+                    </div>
+                    <div class="file-selected" id="fileSelected-demais">
+                        <strong>Arquivo:</strong> <span id="fileName-demais"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section fechado">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Selecionar a Imagem Base64</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>Código Base64 da imagem (PNG ou JPEG)</label>
+                    <textarea id="imagemBase64-demais" placeholder="data:image/png;base64,iVBORw0KGgo..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Preview da Imagem Base64</div>
+            </div>
+            <div class="preview-box" style="margin:0 20px 20px 20px;">
+                <h4>Pré-visualização da imagem:</h4>
+                <img id="previewImg-demais" class="preview-image" style="display:none;" alt="Imagem">
+                <p id="noPreview-demais" style="text-align:center;color:#999;font-size:11px;padding:15px;">Aguardando código Base64 válido</p>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Configuração da Página</div>
+            </div>
+            <div class="radio-section">
+                <div class="radio-section-title">Configurações de inserção</div>
+                <div style="margin-bottom:15px;">
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Posição da nova página:</label>
+                    <div class="radio-columns">
+                        <div class="radio-item"><input type="radio" name="position-demais" id="posInicio-demais" value="start" checked><label for="posInicio-demais">Início do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-demais" id="posFinal-demais" value="end"><label for="posFinal-demais">Final do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-demais" id="posEspecifica-demais" value="custom"><label for="posEspecifica-demais">Posição específica</label></div>
+                    </div>
+                    <div id="customPos-demais" style="display:none;margin-top:10px;">
+                        <input type="number" id="pageNum-demais" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Tamanho da página:</label>
+                    <div class="radio-columns">
+                        <div class="radio-item"><input type="radio" name="pageSize-demais" id="sizeA4-demais" value="a4" checked><label for="sizeA4-demais">A4 (210 x 297 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-demais" id="sizeLetter-demais" value="letter"><label for="sizeLetter-demais">Carta (216 x 279 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-demais" id="sizeImg-demais" value="image"><label for="sizeImg-demais">Dimensão da imagem</label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert" id="alert-demais"></div>
+        <div class="loading" id="loading-demais"><i class="fa-solid fa-hourglass"></i> Processando documento... Aguarde.</div>
+
+        <div class="action-buttons">
+            <button class="btn btn-processar" id="btnProcessar-demais" disabled><i class="fa-solid fa-gear"></i> PROCESSAR PDF</button>
+            <button class="btn btn-limpar" id="btnLimpar-demais"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+        </div>
+    </div>
+
+    <!-- ========== MODO LOTE ========== -->
+    <div class="modo-panel" id="panel-lote">
+
+        <!-- Seleção de ramo para o lote -->
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Imagem a Inserir (por Ramo)</div>
+            </div>
+
+            <div class="lote-tabs-ramo">
+                <div class="lote-tab active" data-lote-ramo="auto">Automóvel</div>
+                <div class="lote-tab" data-lote-ramo="demais">Demais Ramos</div>
+            </div>
+
+            <div class="lote-imagem-preview" id="lote-img-preview-wrap">
+                <img id="lote-preview-img" alt="Preview" style="display:none;">
+                <div class="lote-img-info">
+                    <p id="lote-img-label" style="font-weight:bold; margin-bottom:6px;">Imagem: Automóvel</p>
+                    <p style="color:#999; font-size:11px;">Imagem padrão do ramo selecionado.<br>Para alterar, cole um novo código Base64 abaixo.</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>Código Base64 personalizado (opcional)</label>
+                    <textarea id="imagemBase64-lote" placeholder="Deixe em branco para usar a imagem padrão do ramo..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configurações de inserção lote -->
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Configuração da Página (aplicada a todos os PDFs)</div>
+            </div>
+            <div class="radio-section">
+                <div class="radio-section-title">Configurações de inserção</div>
+                <div style="margin-bottom:15px;">
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Posição da nova página:</label>
+                    <div class="radio-columns">
+                        <div class="radio-item"><input type="radio" name="position-lote" id="posInicio-lote" value="start" checked><label for="posInicio-lote">Início do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-lote" id="posFinal-lote" value="end"><label for="posFinal-lote">Final do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-lote" id="posEspecifica-lote" value="custom"><label for="posEspecifica-lote">Posição específica</label></div>
+                    </div>
+                    <div id="customPos-lote" style="display:none;margin-top:10px;">
+                        <input type="number" id="pageNum-lote" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Tamanho da página:</label>
+                    <div class="radio-columns">
+                        <div class="radio-item"><input type="radio" name="pageSize-lote" id="sizeA4-lote" value="a4" checked><label for="sizeA4-lote">A4 (210 x 297 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-lote" id="sizeLetter-lote" value="letter"><label for="sizeLetter-lote">Carta (216 x 279 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-lote" id="sizeImg-lote" value="image"><label for="sizeImg-lote">Dimensão da imagem</label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload dos PDFs -->
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Selecionar PDFs para Processamento em Lote</div>
+            </div>
+            <div class="form-group">
+                <label>Arquivos PDF</label>
+                <div class="lote-drop-zone" id="lote-drop-zone">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <p><strong>Clique aqui</strong> ou arraste múltiplos arquivos PDF</p>
+                    <p style="font-size:10px;color:#999;">Selecione vários arquivos de uma vez • Formatos: .pdf | Máx: 50MB cada</p>
+                    <input type="file" id="lote-pdf-input" accept=".pdf" multiple>
+                </div>
+
+                <div id="lote-lista-wrap" style="display:none; margin-top:10px;">
+                    <div class="lote-resumo">
+                        <span><strong id="lote-count">0</strong> arquivo(s) selecionado(s)</span>
+                        <span id="lote-resumo-status"></span>
+                    </div>
+                    <div class="lote-lista" id="lote-lista"></div>
+                    <div class="progress-bar-wrap" id="lote-progress-wrap" style="display:none; margin-top:8px;">
+                        <div class="progress-bar-fill" id="lote-progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert" id="alert-lote"></div>
+        <div class="loading" id="loading-lote"><i class="fa-solid fa-hourglass"></i> Processando arquivos em lote... Aguarde.</div>
+
+        <div class="action-buttons">
+            <button class="btn btn-baixar-todos" id="btnBaixarTodos" style="display:none;"><i class="fa-solid fa-download"></i> BAIXAR TODOS</button>
+            <button class="btn btn-processar" id="btnProcessarLote" disabled><i class="fa-solid fa-gears"></i> PROCESSAR LOTE</button>
+            <button class="btn btn-limpar" id="btnLimparLote"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+        </div>
+    </div>
+
+    <!-- ========== MODO CONVERSOR ========== -->
+    <div class="modo-panel" id="panel-conversor">
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Converter Imagem para Base64</div>
+            </div>
+
+            <div class="form-group">
+                <label>Selecione uma imagem (PNG, JPEG, GIF, WEBP)</label>
+                <div class="upload-area" id="conv-drop-zone">
+                    <p><i class="fa-solid fa-image"></i> <strong>Clique aqui</strong> ou arraste a imagem</p>
+                    <p style="font-size:10px;color:#999;">PNG, JPEG, GIF, WEBP • Máx: 10MB</p>
+                    <input type="file" id="conv-file-input" accept="image/png,image/jpeg,image/gif,image/webp">
+                </div>
+            </div>
+
+            <!-- Info do arquivo -->
+            <div id="conv-info-wrap" style="display:none; margin: 0 20px 15px 20px; padding:10px 12px; background:#fafafa; border:1px solid #ddd; font-size:12px;">
+                <div style="display:flex; gap:30px; flex-wrap:wrap;">
+                    <div><strong>Nome:</strong> <span id="conv-info-nome">—</span></div>
+                    <div><strong>Tipo:</strong> <span id="conv-info-tipo">—</span></div>
+                    <div><strong>Tamanho original:</strong> <span id="conv-info-tamanho">—</span></div>
+                    <div><strong>Dimensões:</strong> <span id="conv-info-dims">—</span></div>
+                    <div><strong>Base64 (chars):</strong> <span id="conv-info-b64len">—</span></div>
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div id="conv-preview-wrap" style="display:none; margin: 0 20px 15px 20px;">
+                <div class="preview-box" style="margin:0;">
+                    <h4>Pré-visualização:</h4>
+                    <img id="conv-preview-img" class="preview-image" alt="Preview">
+                </div>
+            </div>
+
+            <!-- Resultado Base64 -->
+            <div id="conv-result-wrap" style="display:none;">
+                <div class="form-group">
+                    <label>Código Base64 gerado:</label>
+                    <textarea id="conv-b64-output" style="min-height:120px;" readonly placeholder="O código Base64 aparecerá aqui..."></textarea>
+                </div>
+
+                <div style="display:flex; gap:10px; margin: 0 20px 20px 20px; flex-wrap:wrap;">
+                    <button class="btn" id="conv-btn-copiar" style="background:#5bc0de;color:white;border-color:#5bc0de;font-weight:bold;">
+                        <i class="fa-solid fa-copy"></i> COPIAR BASE64
+                    </button>
+                    <button class="btn" id="conv-btn-usar-auto" style="background:#4a6675;color:white;border-color:#3d5560;">
+                        <i class="fa-solid fa-car"></i> Usar em Automóvel
+                    </button>
+                    <button class="btn" id="conv-btn-usar-demais" style="background:#4a6675;color:white;border-color:#3d5560;">
+                        <i class="fa-solid fa-file-contract"></i> Usar em Demais Ramos
+                    </button>
+                    <button class="btn" id="conv-btn-usar-lote" style="background:#4a6675;color:white;border-color:#3d5560;">
+                        <i class="fa-solid fa-layer-group"></i> Usar no Lote
+                    </button>
+                </div>
+
+                <div class="alert" id="alert-conv" style="margin:0 20px 15px 20px;"></div>
+            </div>
+
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-limpar" id="conv-btn-limpar"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+        </div>
+    </div>
+
+</div><!-- fim main-content -->
+
+<script>
+const { PDFDocument } = PDFLib;
+
+// =====================================================
+//  IMAGENS PADRÃO
+// =====================================================
+const IMAGENS_PADRAO = {
+    auto:   '',
+    demais: ''};
+
+// =====================================================
+//  HELPER: validar base64
+// =====================================================
+function ehBase64Valido(texto) {
+    return /^data:image\/(png|jpg|jpeg|gif|webp);base64,/.test(texto);
+}
+
+// =====================================================
+//  HELPER: processar UM pdf
+// =====================================================
+async function processarUmPDF(arrayBuffer, imagemBase64, position, insertIndex_override, pageSize, totalPagesHint) {
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    const totalPages = pdfDoc.getPageCount();
+
+    let insertIndex;
+    if (position === 'start') {
+        insertIndex = 0;
+    } else if (position === 'end') {
+        insertIndex = totalPages;
+    } else {
+        insertIndex = Math.max(0, Math.min(insertIndex_override - 1, totalPages));
+    }
+
+    let image;
+    if (imagemBase64.includes('image/png')) {
+        image = await pdfDoc.embedPng(imagemBase64);
+    } else {
+        image = await pdfDoc.embedJpg(imagemBase64);
+    }
+
+    const imageDims = image.scale(1);
+    let page;
+    if (pageSize === 'image') {
+        page = pdfDoc.insertPage(insertIndex, [imageDims.width, imageDims.height]);
+    } else if (pageSize === 'a4') {
+        page = pdfDoc.insertPage(insertIndex, [595, 842]);
+    } else {
+        page = pdfDoc.insertPage(insertIndex, [612, 792]);
+    }
+
+    const { width, height } = page.getSize();
+    page.drawImage(image, { x: 0, y: 0, width, height });
+
+    return await pdfDoc.save();
+}
+
+// =====================================================
+//  HELPER: download de bytes
+// =====================================================
+function downloadPDF(bytes, nomeArquivo) {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// =====================================================
+//  ABAS PRINCIPAIS
+// =====================================================
+document.querySelectorAll('.tab-ramo').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.modo).classList.add('active');
+    });
+});
+
+// =====================================================
+//  MODO SIMPLES (auto + demais) - fábrica de lógica
+// =====================================================
+function configurarModoSimples(modo) {
+    const uploadArea    = document.getElementById('uploadArea-' + modo);
+    const pdfInput      = document.getElementById('pdfInput-' + modo);
+    const fileSelected  = document.getElementById('fileSelected-' + modo);
+    const fileNameSpan  = document.getElementById('fileName-' + modo);
+    const textarea      = document.getElementById('imagemBase64-' + modo);
+    const previewImg    = document.getElementById('previewImg-' + modo);
+    const noPreview     = document.getElementById('noPreview-' + modo);
+    const btnProcessar  = document.getElementById('btnProcessar-' + modo);
+    const btnLimpar     = document.getElementById('btnLimpar-' + modo);
+    const alertBox      = document.getElementById('alert-' + modo);
+    const loadingBox    = document.getElementById('loading-' + modo);
+    const customPosDiv  = document.getElementById('customPos-' + modo);
+    const pageNumInput  = document.getElementById('pageNum-' + modo);
+    let pdfFile = null;
+
+    function showAlert(msg, type) {
+        alertBox.textContent = msg;
+        alertBox.className = `alert ${type} show`;
+    }
+
+    function hideAlert() { alertBox.className = 'alert'; }
+
+    function validar() {
+        btnProcessar.disabled = !(pdfFile && ehBase64Valido(textarea.value.trim()));
+    }
+
+    // Preencher imagem padrão
+    textarea.value = IMAGENS_PADRAO[modo] || IMAGENS_PADRAO['auto'];
+    previewImg.src = textarea.value;
+    previewImg.style.display = 'block';
+    noPreview.style.display = 'none';
+
+    // Upload
+    uploadArea.addEventListener('click', () => pdfInput.click());
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('active'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('active'));
+    uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type === 'application/pdf') {
+            pdfFile = files[0];
+            fileNameSpan.textContent = files[0].name;
+            fileSelected.classList.add('show');
+            validar(); hideAlert();
+        } else { showAlert('Selecione um arquivo PDF válido.', 'error'); }
+    });
+    pdfInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+            pdfFile = e.target.files[0];
+            fileNameSpan.textContent = pdfFile.name;
+            fileSelected.classList.add('show');
+            validar(); hideAlert();
+        }
+    });
+
+    // Preview base64
+    textarea.addEventListener('input', () => {
+        const val = textarea.value.trim();
+        if (ehBase64Valido(val)) {
+            previewImg.src = val;
+            previewImg.style.display = 'block';
+            noPreview.style.display = 'none';
+        } else {
+            previewImg.style.display = 'none';
+            noPreview.style.display = 'block';
+        }
+        validar();
+    });
+
+    // Posição específica
+    document.querySelectorAll(`input[name="position-${modo}"]`).forEach(r => {
+        r.addEventListener('change', e => {
+            customPosDiv.style.display = e.target.value === 'custom' ? 'block' : 'none';
+        });
+    });
+
+    // Processar
+    btnProcessar.addEventListener('click', async () => {
+        if (!pdfFile) { showAlert('Selecione um arquivo PDF.', 'error'); return; }
+        const imgVal = textarea.value.trim();
+        if (!ehBase64Valido(imgVal)) { showAlert('Código Base64 inválido.', 'error'); return; }
+
+        try {
+            btnProcessar.disabled = true;
+            btnLimpar.disabled = true;
+            loadingBox.classList.add('show');
+            hideAlert();
+
+            const position  = document.querySelector(`input[name="position-${modo}"]:checked`).value;
+            const pageSize  = document.querySelector(`input[name="pageSize-${modo}"]:checked`).value;
+            let customPage  = parseInt(pageNumInput.value) || 1;
+
+            const arrayBuffer = await pdfFile.arrayBuffer();
+            const bytes = await processarUmPDF(arrayBuffer, imgVal, position, customPage, pageSize);
+            downloadPDF(bytes, pdfFile.name.replace('.pdf', '_COMCAPA.pdf'));
+            showAlert('✓ PDF gerado com sucesso! Download iniciado.', 'success');
+        } catch (err) {
+            showAlert('✗ Erro: ' + err.message, 'error');
+        } finally {
+            btnProcessar.disabled = false;
+            btnLimpar.disabled = false;
+            loadingBox.classList.remove('show');
+        }
+    });
+
+    // Limpar
+    btnLimpar.addEventListener('click', () => {
+        pdfFile = null;
+        pdfInput.value = '';
+        fileSelected.classList.remove('show');
+        textarea.value = IMAGENS_PADRAO[modo] || IMAGENS_PADRAO['auto'];
+        previewImg.src = textarea.value;
+        previewImg.style.display = 'block';
+        noPreview.style.display = 'none';
+        btnProcessar.disabled = true;
+        document.getElementById('posInicio-' + modo).checked = true;
+        document.getElementById('sizeA4-' + modo).checked = true;
+        customPosDiv.style.display = 'none';
+        pageNumInput.value = '';
+        hideAlert();
+    });
+}
+
+configurarModoSimples('auto');
+configurarModoSimples('demais');
+
+// =====================================================
+//  MODO LOTE
+// =====================================================
+(function() {
+    const dropZone      = document.getElementById('lote-drop-zone');
+    const pdfInput      = document.getElementById('lote-pdf-input');
+    const lista         = document.getElementById('lote-lista');
+    const listaWrap     = document.getElementById('lote-lista-wrap');
+    const countSpan     = document.getElementById('lote-count');
+    const resumoStatus  = document.getElementById('lote-resumo-status');
+    const btnProcessar  = document.getElementById('btnProcessarLote');
+    const btnLimpar     = document.getElementById('btnLimparLote');
+    const btnBaixar     = document.getElementById('btnBaixarTodos');
+    const alertBox      = document.getElementById('alert-lote');
+    const loadingBox    = document.getElementById('loading-lote');
+    const textarea      = document.getElementById('imagemBase64-lote');
+    const lotePreview   = document.getElementById('lote-preview-img');
+    const loteLabel     = document.getElementById('lote-img-label');
+    const progressWrap  = document.getElementById('lote-progress-wrap');
+    const progressFill  = document.getElementById('lote-progress-fill');
+
+    let arquivos = [];          // { file, status, bytes, nome }
+    let ramoLote = 'auto';
+
+    function showAlert(msg, type) {
+        alertBox.textContent = msg;
+        alertBox.className = `alert ${type} show`;
+    }
+    function hideAlert() { alertBox.className = 'alert'; }
+
+    // Tabs de ramo do lote
+    document.querySelectorAll('.lote-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.lote-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            ramoLote = tab.dataset.loteRamo;
+            atualizarPreviewLote();
+        });
+    });
+
+    function getImagemLote() {
+        const custom = textarea.value.trim();
+        if (ehBase64Valido(custom)) return custom;
+        return IMAGENS_PADRAO[ramoLote] || IMAGENS_PADRAO['auto'];
+    }
+
+    function atualizarPreviewLote() {
+        const img = getImagemLote();
+        lotePreview.src = img;
+        lotePreview.style.display = 'block';
+        loteLabel.textContent = 'Imagem: ' + (ramoLote === 'auto' ? 'Automóvel' : 'Demais Ramos');
+    }
+
+    textarea.addEventListener('input', atualizarPreviewLote);
+    atualizarPreviewLote();
+
+    // Drag & Drop
+    dropZone.addEventListener('click', () => pdfInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        adicionarArquivos(Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf'));
+    });
+    pdfInput.addEventListener('change', e => {
+        adicionarArquivos(Array.from(e.target.files));
+        pdfInput.value = '';
+    });
+
+    function adicionarArquivos(novos) {
+        novos.forEach(f => {
+            // Evitar duplicatas pelo nome
+            if (!arquivos.find(a => a.file.name === f.name && a.file.size === f.size)) {
+                arquivos.push({ file: f, status: 'aguardando', bytes: null });
+            }
+        });
+        renderLista();
+        validarLote();
+    }
+
+    function renderLista() {
+        lista.innerHTML = '';
+        arquivos.forEach((item, idx) => {
+            const el = document.createElement('div');
+            el.className = 'lote-item';
+            el.dataset.idx = idx;
+
+            const icone = document.createElement('i');
+            icone.className = 'fa-solid fa-file-pdf lote-item-icon';
+
+            const nome = document.createElement('span');
+            nome.className = 'lote-item-nome';
+            nome.title = item.file.name;
+            nome.textContent = item.file.name;
+
+            const tamanho = document.createElement('span');
+            tamanho.className = 'lote-item-tamanho';
+            tamanho.textContent = formatBytes(item.file.size);
+
+            const status = document.createElement('span');
+            status.className = 'lote-item-status status-' + item.status;
+            const labels = { aguardando: 'Aguardando', processando: '⏳ Processando', ok: '✓ OK', erro: '✗ Erro' };
+            status.textContent = labels[item.status] || item.status;
+
+            const remover = document.createElement('i');
+            remover.className = 'fa-solid fa-xmark lote-item-remover';
+            remover.title = 'Remover';
+            remover.addEventListener('click', () => {
+                arquivos.splice(idx, 1);
+                renderLista();
+                validarLote();
+            });
+
+            el.appendChild(icone);
+            el.appendChild(nome);
+            el.appendChild(tamanho);
+            el.appendChild(status);
+            el.appendChild(remover);
+            lista.appendChild(el);
+        });
+
+        listaWrap.style.display = arquivos.length > 0 ? 'block' : 'none';
+        countSpan.textContent = arquivos.length;
+    }
+
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+        return (b/1048576).toFixed(1) + ' MB';
+    }
+
+    function validarLote() {
+        btnProcessar.disabled = arquivos.length === 0;
+    }
+
+    function atualizarStatusItem(idx, status) {
+        arquivos[idx].status = status;
+        const items = lista.querySelectorAll('.lote-item');
+        if (items[idx]) {
+            const statusEl = items[idx].querySelector('.lote-item-status');
+            statusEl.className = 'lote-item-status status-' + status;
+            const labels = { aguardando: 'Aguardando', processando: '⏳ Processando', ok: '✓ OK', erro: '✗ Erro' };
+            statusEl.textContent = labels[status] || status;
+        }
+    }
+
+    // Processar lote
+    btnProcessar.addEventListener('click', async () => {
+        if (arquivos.length === 0) return;
+
+        const imgVal    = getImagemLote();
+        const position  = document.querySelector('input[name="position-lote"]:checked').value;
+        const pageSize  = document.querySelector('input[name="pageSize-lote"]:checked').value;
+        const customPage = parseInt(document.getElementById('pageNum-lote').value) || 1;
+
+        btnProcessar.disabled = true;
+        btnLimpar.disabled = true;
+        btnBaixar.style.display = 'none';
+        loadingBox.classList.add('show');
+        progressWrap.style.display = 'block';
+        progressFill.style.width = '0%';
+        hideAlert();
+
+        let okCount = 0, errCount = 0;
+
+        for (let i = 0; i < arquivos.length; i++) {
+            atualizarStatusItem(i, 'processando');
+            try {
+                const arrayBuffer = await arquivos[i].file.arrayBuffer();
+                const bytes = await processarUmPDF(arrayBuffer, imgVal, position, customPage, pageSize);
+                arquivos[i].bytes = bytes;
+                arquivos[i].nomeDestino = arquivos[i].file.name.replace('.pdf', '_COMCAPA.pdf');
+                atualizarStatusItem(i, 'ok');
+                okCount++;
+            } catch(err) {
+                atualizarStatusItem(i, 'erro');
+                errCount++;
+                console.error('Erro em ' + arquivos[i].file.name, err);
+            }
+
+            // Progresso
+            const pct = Math.round(((i + 1) / arquivos.length) * 100);
+            progressFill.style.width = pct + '%';
+        }
+
+        loadingBox.classList.remove('show');
+        btnLimpar.disabled = false;
+        validarLote();
+
+        const msg = `✓ Processados: ${okCount} | ✗ Erros: ${errCount}`;
+        showAlert(msg, errCount === 0 ? 'success' : 'info');
+        resumoStatus.textContent = msg;
+
+        if (okCount > 0) {
+            // Download automático individual
+            arquivos.filter(a => a.status === 'ok').forEach(a => {
+                downloadPDF(a.bytes, a.nomeDestino);
+            });
+            btnBaixar.style.display = okCount > 1 ? 'flex' : 'none';
+        }
+    });
+
+    // Baixar todos novamente
+    btnBaixar.addEventListener('click', () => {
+        arquivos.filter(a => a.status === 'ok' && a.bytes).forEach(a => {
+            downloadPDF(a.bytes, a.nomeDestino);
+        });
+    });
+
+    // Limpar lote
+    btnLimpar.addEventListener('click', () => {
+        arquivos = [];
+        renderLista();
+        validarLote();
+        progressWrap.style.display = 'none';
+        progressFill.style.width = '0%';
+        btnBaixar.style.display = 'none';
+        document.getElementById('posInicio-lote').checked = true;
+        document.getElementById('sizeA4-lote').checked = true;
+        document.getElementById('customPos-lote').style.display = 'none';
+        document.getElementById('pageNum-lote').value = '';
+        resumoStatus.textContent = '';
+        hideAlert();
+    });
+
+    // Posição específica lote
+    document.querySelectorAll('input[name="position-lote"]').forEach(r => {
+        r.addEventListener('change', e => {
+            document.getElementById('customPos-lote').style.display = e.target.value === 'custom' ? 'block' : 'none';
+        });
+    });
+
+})();
+
+// =====================================================
+//  MODO CONVERSOR
+// =====================================================
+(function() {
+    const dropZone      = document.getElementById('conv-drop-zone');
+    const fileInput     = document.getElementById('conv-file-input');
+    const infoWrap      = document.getElementById('conv-info-wrap');
+    const previewWrap   = document.getElementById('conv-preview-wrap');
+    const resultWrap    = document.getElementById('conv-result-wrap');
+    const previewImg    = document.getElementById('conv-preview-img');
+    const b64Output     = document.getElementById('conv-b64-output');
+    const alertBox      = document.getElementById('alert-conv');
+
+    const infoNome      = document.getElementById('conv-info-nome');
+    const infoTipo      = document.getElementById('conv-info-tipo');
+    const infoTamanho   = document.getElementById('conv-info-tamanho');
+    const infoDims      = document.getElementById('conv-info-dims');
+    const infoB64len    = document.getElementById('conv-info-b64len');
+
+    function showAlert(msg, type) {
+        alertBox.textContent = msg;
+        alertBox.className = `alert ${type} show`;
+        alertBox.style.display = 'block';
+    }
+    function hideAlert() { alertBox.className = 'alert'; alertBox.style.display = 'none'; }
+
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+        return (b/1048576).toFixed(1) + ' MB';
+    }
+
+    function processarImagem(file) {
+        if (!file || !file.type.startsWith('image/')) {
+            showAlert('Selecione um arquivo de imagem válido (PNG, JPEG, GIF, WEBP).', 'error');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            showAlert('Arquivo muito grande. Máximo permitido: 10MB.', 'error');
+            return;
+        }
+
+        hideAlert();
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+
+            // Preenche info
+            infoNome.textContent     = file.name;
+            infoTipo.textContent     = file.type;
+            infoTamanho.textContent  = formatBytes(file.size);
+            infoB64len.textContent   = base64.length.toLocaleString('pt-BR') + ' chars';
+
+            // Dimensões via img
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                infoDims.textContent = tempImg.naturalWidth + ' × ' + tempImg.naturalHeight + ' px';
+            };
+            tempImg.src = base64;
+
+            // Preview
+            previewImg.src = base64;
+            previewWrap.style.display = 'block';
+            infoWrap.style.display = 'block';
+
+            // Output
+            b64Output.value = base64;
+            resultWrap.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Drop zone
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) processarImagem(files[0]);
+    });
+    fileInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) processarImagem(e.target.files[0]);
+        fileInput.value = '';
+    });
+
+    // Copiar
+    document.getElementById('conv-btn-copiar').addEventListener('click', () => {
+        if (!b64Output.value) return;
+        navigator.clipboard.writeText(b64Output.value).then(() => {
+            showAlert('✓ Código Base64 copiado para a área de transferência!', 'success');
+        }).catch(() => {
+            b64Output.select();
+            document.execCommand('copy');
+            showAlert('✓ Código Base64 copiado!', 'success');
+        });
+    });
+
+    // Usar em Automóvel
+    document.getElementById('conv-btn-usar-auto').addEventListener('click', () => {
+        if (!b64Output.value) return;
+        document.getElementById('imagemBase64-auto').value = b64Output.value;
+        document.getElementById('imagemBase64-auto').dispatchEvent(new Event('input'));
+        // Troca para aba auto
+        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector('[data-modo="auto"]').classList.add('active');
+        document.getElementById('panel-auto').classList.add('active');
+        showAlert('✓ Imagem aplicada na aba Automóvel!', 'success');
+    });
+
+    // Usar em Demais Ramos
+    document.getElementById('conv-btn-usar-demais').addEventListener('click', () => {
+        if (!b64Output.value) return;
+        document.getElementById('imagemBase64-demais').value = b64Output.value;
+        document.getElementById('imagemBase64-demais').dispatchEvent(new Event('input'));
+        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector('[data-modo="demais"]').classList.add('active');
+        document.getElementById('panel-demais').classList.add('active');
+        showAlert('✓ Imagem aplicada na aba Demais Ramos!', 'success');
+    });
+
+    // Usar no Lote
+    document.getElementById('conv-btn-usar-lote').addEventListener('click', () => {
+        if (!b64Output.value) return;
+        document.getElementById('imagemBase64-lote').value = b64Output.value;
+        document.getElementById('imagemBase64-lote').dispatchEvent(new Event('input'));
+        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector('[data-modo="lote"]').classList.add('active');
+        document.getElementById('panel-lote').classList.add('active');
+        showAlert('✓ Imagem aplicada na aba Em Lote!', 'success');
+    });
+
+    // Limpar
+    document.getElementById('conv-btn-limpar').addEventListener('click', () => {
+        fileInput.value = '';
+        b64Output.value = '';
+        previewImg.src = '';
+        infoWrap.style.display = 'none';
+        previewWrap.style.display = 'none';
+        resultWrap.style.display = 'none';
+        hideAlert();
+    });
+
+})();
+
+
+document.querySelectorAll('.form-section.fechado').forEach(section => {
+    Array.from(section.children)
+        .filter(el => !el.classList.contains('header-section'))
+        .forEach(el => el.style.display = 'none');
+});
+
+document.querySelectorAll('.header-section').forEach(header => {
+    header.addEventListener('click', () => {
+        const section = header.closest('.form-section');
+        const conteudo = Array.from(section.children).filter(el => !el.classList.contains('header-section'));
+        const fechado = section.classList.toggle('fechado');
+        conteudo.forEach(el => { el.style.display = fechado ? 'none' : ''; });
+    });
+});
+</script>
+</body>
+</html>

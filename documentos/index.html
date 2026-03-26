@@ -1137,7 +1137,7 @@ function gerarPDF_cancelamento() {
 
     let docDefinition = {
         content: [
-            { text: ['A ', seguradora_valor.toUpperCase(), '/ ,corretora.toUpperCase(),'.\n\n\n\n'], alignment: 'left' },
+            { text: ['A ', seguradora_valor.toUpperCase(), '/' ,corretora.toUpperCase(),'.\n\n\n\n'], alignment: 'left' },
             { text: ['Ref. a Proposta/Apólice Nº: ', {text: apolice, bold: true}, '\n']},
             { text: '', margin: [0, 3, 0, 3], alignment: 'justify'},
             { text: ['Segurado: ', {text: nome.toUpperCase(), bold: true}, '\n']},

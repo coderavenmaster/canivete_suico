@@ -23,6 +23,7 @@
             display: flex;
             gap: 5px;
             margin: 10px 20px 0 20px;
+            flex-wrap: wrap;
         }
 
         .tab-ramo {
@@ -414,6 +415,83 @@
         }
 
         .btn-baixar-todos:hover:not(:disabled) { background-color: #4cae4c; }
+
+        /* ===================== TUTORIAL ===================== */
+        .tutorial-content {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tutorial-section {
+            margin-bottom: 30px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4a6675;
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .tutorial-section h2 {
+            color: #4a6675;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tutorial-section h3 {
+            color: #555;
+            font-size: 14px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .tutorial-section p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .tutorial-section ul {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .tutorial-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .tutorial-highlight {
+            background-color: #fff3cd;
+            padding: 12px;
+            border-left: 3px solid #f0ad4e;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .tutorial-tip {
+            background-color: #d9edf7;
+            padding: 12px;
+            border-left: 3px solid #5bc0de;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .tutorial-step {
+            background-color: white;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .tutorial-step strong {
+            color: #4a6675;
+            display: block;
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
@@ -425,8 +503,10 @@
         <div class="tab-ramo active" data-modo="auto">Automóvel</div>
         <div class="tab-ramo" data-modo="demais">Demais Ramos</div>
         <div class="tab-ramo" data-modo="lote"><i class="fa-solid fa-layer-group"></i> Em Lote</div>
+        <div class="tab-ramo" data-modo="juntar"><i class="fa-solid fa-file-zipper"></i> Juntar PDFs</div>
         <div class="tab-ramo" data-modo="conversor"><i class="fa-solid fa-image"></i> Conversor</div>
-        <div  class="tab-ramo" onclick="window.location.href='https://coderavenmaster.github.io/canivete_suico/'">Voltar</div>
+        <div class="tab-ramo" data-modo="tutorial"><i class="fa-solid fa-book"></i> Tutorial</div>
+        <div class="tab-ramo" onclick="window.location.href='https://coderavenmaster.github.io/canivete_suico/'">Voltar</div>
     </div>
 
     <!-- ========== MODO AUTOMÓVEL ========== -->
@@ -700,6 +780,56 @@
         </div>
     </div>
 
+    <!-- ========== MODO JUNTAR PDFs ========== -->
+    <div class="modo-panel" id="panel-juntar">
+        
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Selecionar PDFs para Juntar</div>
+            </div>
+            <div class="form-group">
+                <label>Arquivos PDF (a ordem de seleção será mantida)</label>
+                <div class="lote-drop-zone" id="juntar-drop-zone">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <p><strong>Clique aqui</strong> ou arraste múltiplos arquivos PDF</p>
+                    <p style="font-size:10px;color:#999;">Selecione na ordem desejada • Formatos: .pdf | Máx: 50MB cada</p>
+                    <input type="file" id="juntar-pdf-input" accept=".pdf" multiple>
+                </div>
+
+                <div id="juntar-lista-wrap" style="display:none; margin-top:10px;">
+                    <div class="lote-resumo">
+                        <span><strong id="juntar-count">0</strong> arquivo(s) para juntar</span>
+                        <button class="btn" id="btnReordenar" style="font-size:11px; padding:4px 10px;">
+                            <i class="fa-solid fa-arrows-up-down"></i> Reordenar
+                        </button>
+                    </div>
+                    <div class="lote-lista" id="juntar-lista"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Nome do Arquivo Final</div>
+            </div>
+            <div class="form-group">
+                <label>Nome para o PDF unificado</label>
+                <input type="text" id="juntar-nome-arquivo" placeholder="documento_unificado" value="documento_unificado" style="max-width:400px;">
+                <p style="font-size:11px;color:#999;margin-top:4px;">Será adicionado .pdf automaticamente</p>
+            </div>
+        </div>
+
+        <div class="alert" id="alert-juntar"></div>
+        <div class="loading" id="loading-juntar"><i class="fa-solid fa-hourglass"></i> Juntando PDFs... Aguarde.</div>
+
+        <div class="action-buttons">
+            <button class="btn btn-processar" id="btnJuntar" disabled><i class="fa-solid fa-file-zipper"></i> JUNTAR PDFs</button>
+            <button class="btn btn-limpar" id="btnLimparJuntar"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+        </div>
+    </div>
+
     <!-- ========== MODO CONVERSOR ========== -->
     <div class="modo-panel" id="panel-conversor">
 
@@ -769,6 +899,142 @@
         </div>
     </div>
 
+    <!-- ========== MODO TUTORIAL ========== -->
+    <div class="modo-panel" id="panel-tutorial">
+        <div class="tutorial-content">
+            
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-info-circle"></i> Bem-vindo ao Sistema de Manipulação de PDFs</h2>
+                <p>Este sistema oferece diversas funcionalidades para trabalhar com arquivos PDF e imagens. Abaixo você encontrará um guia completo de como usar cada recurso.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-car"></i> 1. Automóvel / Demais Ramos</h2>
+                <p>Essas abas permitem inserir uma página de imagem em um PDF existente, com configurações específicas para cada tipo de documento.</p>
+                
+                <h3>Como usar:</h3>
+                <div class="tutorial-step">
+                    <strong>Passo 1:</strong> Selecione o arquivo PDF base clicando na área de upload ou arrastando o arquivo.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 2:</strong> Cole o código Base64 da imagem que deseja inserir (ou use a imagem padrão já carregada).
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 3:</strong> Visualize a imagem na seção de preview para confirmar.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 4:</strong> Configure a posição (início, final ou específica) e o tamanho da página.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 5:</strong> Clique em "PROCESSAR PDF" e o arquivo será baixado automaticamente.
+                </div>
+
+                <div class="tutorial-tip">
+                    <strong><i class="fa-solid fa-lightbulb"></i> Dica:</strong> Use o Conversor para transformar qualquer imagem em código Base64!
+                </div>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-layer-group"></i> 2. Processamento em Lote</h2>
+                <p>Processe múltiplos PDFs de uma só vez, inserindo a mesma imagem em todos eles.</p>
+                
+                <h3>Como usar:</h3>
+                <div class="tutorial-step">
+                    <strong>Passo 1:</strong> Escolha o ramo (Automóvel ou Demais Ramos) para selecionar a imagem padrão.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 2:</strong> Configure a posição e tamanho da página (será aplicado a todos os PDFs).
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 3:</strong> Arraste ou selecione múltiplos arquivos PDF.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 4:</strong> Clique em "PROCESSAR LOTE" e aguarde.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 5:</strong> Os arquivos processados serão baixados automaticamente.
+                </div>
+
+                <div class="tutorial-highlight">
+                    <strong><i class="fa-solid fa-exclamation-triangle"></i> Importante:</strong> Você pode remover arquivos da lista clicando no X ao lado de cada item antes de processar.
+                </div>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-file-zipper"></i> 3. Juntar PDFs</h2>
+                <p>Combine múltiplos arquivos PDF em um único documento.</p>
+                
+                <h3>Como usar:</h3>
+                <div class="tutorial-step">
+                    <strong>Passo 1:</strong> Selecione os arquivos PDF na ordem desejada.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 2:</strong> Use o botão "Reordenar" se precisar mudar a ordem dos arquivos.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 3:</strong> Digite o nome para o arquivo final (sem a extensão .pdf).
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 4:</strong> Clique em "JUNTAR PDFs" para criar o documento unificado.
+                </div>
+
+                <div class="tutorial-tip">
+                    <strong><i class="fa-solid fa-lightbulb"></i> Dica:</strong> A ordem dos arquivos é importante! Selecione-os na sequência que deseja no documento final.
+                </div>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-image"></i> 4. Conversor de Imagem</h2>
+                <p>Converta qualquer imagem (PNG, JPEG, GIF, WEBP) em código Base64 para usar nas outras funcionalidades.</p>
+                
+                <h3>Como usar:</h3>
+                <div class="tutorial-step">
+                    <strong>Passo 1:</strong> Arraste ou selecione uma imagem (máx. 10MB).
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 2:</strong> Visualize a imagem e suas informações (tamanho, dimensões, etc).
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 3:</strong> Copie o código Base64 gerado ou use os botões rápidos para aplicar diretamente em outras abas.
+                </div>
+
+                <div class="tutorial-highlight">
+                    <strong><i class="fa-solid fa-star"></i> Recurso útil:</strong> Use os botões "Usar em Automóvel", "Usar em Demais Ramos" ou "Usar no Lote" para aplicar a imagem diretamente sem precisar copiar e colar!
+                </div>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-question-circle"></i> Perguntas Frequentes</h2>
+                
+                <h3>O que é Base64?</h3>
+                <p>Base64 é uma forma de codificar imagens em texto. Permite que você armazene e transmita imagens como uma sequência de caracteres.</p>
+                
+                <h3>Qual o tamanho máximo dos arquivos?</h3>
+                <ul>
+                    <li>PDFs: 50MB por arquivo</li>
+                    <li>Imagens: 10MB por arquivo</li>
+                </ul>
+                
+                <h3>Os arquivos são enviados para algum servidor?</h3>
+                <p>Não! Todo o processamento é feito localmente no seu navegador. Seus arquivos não saem do seu computador.</p>
+                
+                <h3>Posso usar em dispositivos móveis?</h3>
+                <p>Sim! O sistema funciona em navegadores modernos de computadores, tablets e smartphones.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-keyboard"></i> Atalhos e Dicas</h2>
+                <ul>
+                    <li><strong>Seções recolhíveis:</strong> Clique nos cabeçalhos azuis para mostrar/ocultar seções.</li>
+                    <li><strong>Drag & Drop:</strong> Arraste arquivos diretamente para as áreas de upload.</li>
+                    <li><strong>Múltiplos arquivos:</strong> Use Ctrl (Windows) ou Cmd (Mac) para selecionar vários arquivos de uma vez.</li>
+                    <li><strong>Limpar formulário:</strong> Use o botão "LIMPAR" para resetar todos os campos de uma vez.</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
 </div><!-- fim main-content -->
 
 <script>
@@ -779,7 +1045,8 @@ const { PDFDocument } = PDFLib;
 // =====================================================
 const IMAGENS_PADRAO = {
     auto:   '',
-    demais: ''};
+    demais: ''
+};
 
 // =====================================================
 //  HELPER: validar base64
@@ -828,6 +1095,22 @@ async function processarUmPDF(arrayBuffer, imagemBase64, position, insertIndex_o
 }
 
 // =====================================================
+//  HELPER: juntar múltiplos PDFs
+// =====================================================
+async function juntarPDFs(arrayBuffers) {
+    const pdfDocFinal = await PDFDocument.create();
+    
+    for (const buffer of arrayBuffers) {
+        const pdfDoc = await PDFDocument.load(buffer);
+        const pageIndices = pdfDoc.getPageIndices();
+        const copiedPages = await pdfDocFinal.copyPages(pdfDoc, pageIndices);
+        copiedPages.forEach(page => pdfDocFinal.addPage(page));
+    }
+    
+    return await pdfDocFinal.save();
+}
+
+// =====================================================
 //  HELPER: download de bytes
 // =====================================================
 function downloadPDF(bytes, nomeArquivo) {
@@ -847,6 +1130,7 @@ function downloadPDF(bytes, nomeArquivo) {
 // =====================================================
 document.querySelectorAll('.tab-ramo').forEach(tab => {
     tab.addEventListener('click', () => {
+        if (tab.onclick) return; // Skip tabs with onclick (Voltar button)
         document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
@@ -1221,6 +1505,184 @@ configurarModoSimples('demais');
 })();
 
 // =====================================================
+//  MODO JUNTAR PDFs
+// =====================================================
+(function() {
+    const dropZone      = document.getElementById('juntar-drop-zone');
+    const pdfInput      = document.getElementById('juntar-pdf-input');
+    const lista         = document.getElementById('juntar-lista');
+    const listaWrap     = document.getElementById('juntar-lista-wrap');
+    const countSpan     = document.getElementById('juntar-count');
+    const btnJuntar     = document.getElementById('btnJuntar');
+    const btnLimpar     = document.getElementById('btnLimparJuntar');
+    const btnReordenar  = document.getElementById('btnReordenar');
+    const alertBox      = document.getElementById('alert-juntar');
+    const loadingBox    = document.getElementById('loading-juntar');
+    const nomeArquivo   = document.getElementById('juntar-nome-arquivo');
+
+    let arquivos = [];  // { file, ordem }
+
+    function showAlert(msg, type) {
+        alertBox.textContent = msg;
+        alertBox.className = `alert ${type} show`;
+    }
+    function hideAlert() { alertBox.className = 'alert'; }
+
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+        return (b/1048576).toFixed(1) + ' MB';
+    }
+
+    // Drag & Drop
+    dropZone.addEventListener('click', () => pdfInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        adicionarArquivos(Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf'));
+    });
+    pdfInput.addEventListener('change', e => {
+        adicionarArquivos(Array.from(e.target.files));
+        pdfInput.value = '';
+    });
+
+    function adicionarArquivos(novos) {
+        novos.forEach(f => {
+            if (!arquivos.find(a => a.file.name === f.name && a.file.size === f.size)) {
+                arquivos.push({ file: f, ordem: arquivos.length + 1 });
+            }
+        });
+        renderLista();
+        validar();
+    }
+
+    function renderLista() {
+        lista.innerHTML = '';
+        arquivos.forEach((item, idx) => {
+            const el = document.createElement('div');
+            el.className = 'lote-item';
+            el.dataset.idx = idx;
+
+            const ordem = document.createElement('span');
+            ordem.style.cssText = 'font-weight:bold; color:#4a6675; min-width:30px; text-align:center;';
+            ordem.textContent = (idx + 1) + '.';
+
+            const icone = document.createElement('i');
+            icone.className = 'fa-solid fa-file-pdf lote-item-icon';
+
+            const nome = document.createElement('span');
+            nome.className = 'lote-item-nome';
+            nome.title = item.file.name;
+            nome.textContent = item.file.name;
+
+            const tamanho = document.createElement('span');
+            tamanho.className = 'lote-item-tamanho';
+            tamanho.textContent = formatBytes(item.file.size);
+
+            const controles = document.createElement('div');
+            controles.style.cssText = 'display:flex; gap:4px; align-items:center;';
+
+            if (idx > 0) {
+                const btnUp = document.createElement('i');
+                btnUp.className = 'fa-solid fa-arrow-up';
+                btnUp.style.cssText = 'cursor:pointer; color:#5bc0de; padding:4px; font-size:12px;';
+                btnUp.title = 'Mover para cima';
+                btnUp.addEventListener('click', () => {
+                    [arquivos[idx], arquivos[idx-1]] = [arquivos[idx-1], arquivos[idx]];
+                    renderLista();
+                });
+                controles.appendChild(btnUp);
+            }
+
+            if (idx < arquivos.length - 1) {
+                const btnDown = document.createElement('i');
+                btnDown.className = 'fa-solid fa-arrow-down';
+                btnDown.style.cssText = 'cursor:pointer; color:#5bc0de; padding:4px; font-size:12px;';
+                btnDown.title = 'Mover para baixo';
+                btnDown.addEventListener('click', () => {
+                    [arquivos[idx], arquivos[idx+1]] = [arquivos[idx+1], arquivos[idx]];
+                    renderLista();
+                });
+                controles.appendChild(btnDown);
+            }
+
+            const remover = document.createElement('i');
+            remover.className = 'fa-solid fa-xmark lote-item-remover';
+            remover.title = 'Remover';
+            remover.addEventListener('click', () => {
+                arquivos.splice(idx, 1);
+                renderLista();
+                validar();
+            });
+
+            el.appendChild(ordem);
+            el.appendChild(icone);
+            el.appendChild(nome);
+            el.appendChild(tamanho);
+            el.appendChild(controles);
+            el.appendChild(remover);
+            lista.appendChild(el);
+        });
+
+        listaWrap.style.display = arquivos.length > 0 ? 'block' : 'none';
+        countSpan.textContent = arquivos.length;
+    }
+
+    function validar() {
+        btnJuntar.disabled = arquivos.length < 2;
+    }
+
+    // Processar
+    btnJuntar.addEventListener('click', async () => {
+        if (arquivos.length < 2) {
+            showAlert('Selecione pelo menos 2 arquivos PDF para juntar.', 'error');
+            return;
+        }
+
+        try {
+            btnJuntar.disabled = true;
+            btnLimpar.disabled = true;
+            loadingBox.classList.add('show');
+            hideAlert();
+
+            const buffers = [];
+            for (const item of arquivos) {
+                buffers.push(await item.file.arrayBuffer());
+            }
+
+            const bytes = await juntarPDFs(buffers);
+            let nome = nomeArquivo.value.trim() || 'documento_unificado';
+            if (!nome.endsWith('.pdf')) nome += '.pdf';
+            
+            downloadPDF(bytes, nome);
+            showAlert(`✓ ${arquivos.length} PDFs unidos com sucesso! Download iniciado.`, 'success');
+        } catch (err) {
+            showAlert('✗ Erro ao juntar PDFs: ' + err.message, 'error');
+        } finally {
+            btnJuntar.disabled = false;
+            btnLimpar.disabled = false;
+            loadingBox.classList.remove('show');
+        }
+    });
+
+    // Limpar
+    btnLimpar.addEventListener('click', () => {
+        arquivos = [];
+        renderLista();
+        validar();
+        nomeArquivo.value = 'documento_unificado';
+        hideAlert();
+    });
+
+    btnReordenar.addEventListener('click', () => {
+        showAlert('Use as setas ↑↓ ao lado de cada arquivo para reordenar.', 'info');
+    });
+
+})();
+
+// =====================================================
 //  MODO CONVERSOR
 // =====================================================
 (function() {
@@ -1369,7 +1831,9 @@ configurarModoSimples('demais');
 
 })();
 
-
+// =====================================================
+//  SEÇÕES RECOLHÍVEIS
+// =====================================================
 document.querySelectorAll('.form-section.fechado').forEach(section => {
     Array.from(section.children)
         .filter(el => !el.classList.contains('header-section'))

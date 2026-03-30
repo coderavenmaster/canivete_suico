@@ -111,13 +111,6 @@
             box-shadow: 0 0 3px rgba(102,175,233,0.5);
         }
 
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-        }
-
         .radio-section {
             border: 1px solid #ddd;
             padding: 15px;
@@ -347,26 +340,6 @@
 
         .lote-resumo strong { color: #333; }
 
-        .lote-imagem-preview {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            margin: 0 20px 20px 20px;
-            padding: 12px;
-            background-color: #fafafa;
-            border: 1px solid #ddd;
-        }
-
-        .lote-imagem-preview img {
-            max-height: 120px;
-            max-width: 180px;
-            border: 1px solid #ccc;
-            flex-shrink: 0;
-        }
-
-        .lote-imagem-preview .lote-img-info { font-size: 12px; color: #555; }
-        .lote-imagem-preview .lote-img-info p { margin-bottom: 4px; }
-
         .progress-bar-wrap {
             background-color: #e9ecef;
             border-radius: 3px;
@@ -381,31 +354,6 @@
             transition: width 0.3s ease;
             width: 0%;
         }
-
-        .lote-tabs-ramo {
-            display: flex;
-            gap: 5px;
-            margin: 15px 20px 5px 20px;
-        }
-
-        .lote-tab {
-            padding: 5px 12px;
-            font-size: 12px;
-            border: 1px solid #ccc;
-            background-color: #f5f5f5;
-            cursor: pointer;
-            font-weight: bold;
-            color: #555;
-            transition: all 0.2s;
-        }
-
-        .lote-tab.active {
-            background-color: #4a6675;
-            color: white;
-            border-color: #3d5560;
-        }
-
-        .lote-tab:hover:not(.active) { background-color: #e6e6e6; }
 
         .btn-baixar-todos {
             background-color: #5cb85c;
@@ -500,17 +448,16 @@
 
     <!-- ABAS PRINCIPAIS -->
     <div class="tabs-ramos">
-        <div class="tab-ramo active" data-modo="auto">Automóvel</div>
-        <div class="tab-ramo" data-modo="demais">Demais Ramos</div>
+        <div class="tab-ramo active" data-modo="inserir-imagem">Inserir Imagem</div>
+        <div class="tab-ramo" data-modo="inserir-pdf">Inserir PDF</div>
         <div class="tab-ramo" data-modo="lote"><i class="fa-solid fa-layer-group"></i> Em Lote</div>
         <div class="tab-ramo" data-modo="juntar"><i class="fa-solid fa-file-zipper"></i> Juntar PDFs</div>
-        <div class="tab-ramo" data-modo="conversor"><i class="fa-solid fa-image"></i> Conversor</div>
         <div class="tab-ramo" data-modo="tutorial"><i class="fa-solid fa-book"></i> Tutorial</div>
         <div class="tab-ramo" onclick="window.location.href='https://coderavenmaster.github.io/canivete_suico/'">Voltar</div>
     </div>
 
-    <!-- ========== MODO AUTOMÓVEL ========== -->
-    <div class="modo-panel active" id="panel-auto">
+    <!-- ========== MODO INSERIR IMAGEM ========== -->
+    <div class="modo-panel active" id="panel-inserir-imagem">
 
         <div class="form-section">
             <div class="header-section">
@@ -520,27 +467,14 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Arquivo PDF base</label>
-                    <div class="upload-area" id="uploadArea-auto">
+                    <div class="upload-area" id="uploadArea-img">
                         <p><i class="fa-solid fa-file-pdf"></i> <strong>Clique aqui</strong> ou arraste o arquivo PDF</p>
                         <p style="font-size:10px;color:#999;">Formatos: .pdf | Máx: 50MB</p>
-                        <input type="file" id="pdfInput-auto" accept=".pdf">
+                        <input type="file" id="pdfInput-img" accept=".pdf">
                     </div>
-                    <div class="file-selected" id="fileSelected-auto">
-                        <strong>Arquivo:</strong> <span id="fileName-auto"></span>
+                    <div class="file-selected" id="fileSelected-img">
+                        <strong>Arquivo:</strong> <span id="fileName-img"></span>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-section fechado">
-            <div class="header-section">
-                <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Selecionar a Imagem Base64</div>
-            </div>
-            <div class="form-row">
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label>Código Base64 da imagem (PNG ou JPEG)</label>
-                    <textarea id="imagemBase64-auto" placeholder="data:image/png;base64,iVBORw0KGgo..."></textarea>
                 </div>
             </div>
         </div>
@@ -548,12 +482,32 @@
         <div class="form-section">
             <div class="header-section">
                 <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Preview da Imagem Base64</div>
+                <div class="header-title">Selecionar a Imagem para Inserir</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Arquivo de imagem (PNG, JPEG, GIF, WEBP)</label>
+                    <div class="upload-area" id="uploadAreaImagem-img">
+                        <p><i class="fa-solid fa-image"></i> <strong>Clique aqui</strong> ou arraste a imagem</p>
+                        <p style="font-size:10px;color:#999;">PNG, JPEG, GIF, WEBP | Máx: 10MB</p>
+                        <input type="file" id="imagemInput-img" accept="image/png,image/jpeg,image/gif,image/webp">
+                    </div>
+                    <div class="file-selected" id="imagemSelected-img">
+                        <strong>Imagem:</strong> <span id="imagemName-img"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="header-section">
+                <i class="fa-solid fa-chevron-down header-icon"></i>
+                <div class="header-title">Preview da Imagem</div>
             </div>
             <div class="preview-box" style="margin:0 20px 20px 20px;">
                 <h4>Pré-visualização da imagem:</h4>
-                <img id="previewImg-auto" class="preview-image" style="display:none;" alt="Imagem">
-                <p id="noPreview-auto" style="text-align:center;color:#999;font-size:11px;padding:15px;">Aguardando código Base64 válido</p>
+                <img id="previewImg-img" class="preview-image" style="display:none;" alt="Imagem">
+                <p id="noPreview-img" style="text-align:center;color:#999;font-size:11px;padding:15px;">Aguardando seleção de imagem</p>
             </div>
         </div>
 
@@ -567,66 +521,74 @@
                 <div style="margin-bottom:15px;">
                     <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Posição da nova página:</label>
                     <div class="radio-columns">
-                        <div class="radio-item"><input type="radio" name="position-auto" id="posInicio-auto" value="start" checked><label for="posInicio-auto">Início do documento</label></div>
-                        <div class="radio-item"><input type="radio" name="position-auto" id="posFinal-auto" value="end"><label for="posFinal-auto">Final do documento</label></div>
-                        <div class="radio-item"><input type="radio" name="position-auto" id="posEspecifica-auto" value="custom"><label for="posEspecifica-auto">Posição específica</label></div>
+                        <div class="radio-item"><input type="radio" name="position-img" id="posInicio-img" value="start" checked><label for="posInicio-img">Início do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-img" id="posFinal-img" value="end"><label for="posFinal-img">Final do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-img" id="posEspecifica-img" value="custom"><label for="posEspecifica-img">Posição específica</label></div>
                     </div>
-                    <div id="customPos-auto" style="display:none;margin-top:10px;">
-                        <input type="number" id="pageNum-auto" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
+                    <div id="customPos-img" style="display:none;margin-top:10px;">
+                        <input type="number" id="pageNum-img" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
+                        <p style="font-size:11px;color:#666;margin-top:4px;">A imagem será inserida ANTES desta página</p>
                     </div>
                 </div>
                 <div>
                     <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Tamanho da página:</label>
                     <div class="radio-columns">
-                        <div class="radio-item"><input type="radio" name="pageSize-auto" id="sizeA4-auto" value="a4" checked><label for="sizeA4-auto">A4 (210 x 297 mm)</label></div>
-                        <div class="radio-item"><input type="radio" name="pageSize-auto" id="sizeLetter-auto" value="letter"><label for="sizeLetter-auto">Carta (216 x 279 mm)</label></div>
-                        <div class="radio-item"><input type="radio" name="pageSize-auto" id="sizeImg-auto" value="image"><label for="sizeImg-auto">Dimensão da imagem</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-img" id="sizeA4-img" value="a4" checked><label for="sizeA4-img">A4 (210 x 297 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-img" id="sizeLetter-img" value="letter"><label for="sizeLetter-img">Carta (216 x 279 mm)</label></div>
+                        <div class="radio-item"><input type="radio" name="pageSize-img" id="sizeImg-img" value="image"><label for="sizeImg-img">Dimensão da imagem</label></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="alert" id="alert-auto"></div>
-        <div class="loading" id="loading-auto"><i class="fa-solid fa-hourglass"></i> Processando documento... Aguarde.</div>
+        <div class="alert" id="alert-img"></div>
+        <div class="loading" id="loading-img"><i class="fa-solid fa-hourglass"></i> Processando documento... Aguarde.</div>
 
         <div class="action-buttons">
-            <button class="btn btn-processar" id="btnProcessar-auto" disabled><i class="fa-solid fa-gear"></i> PROCESSAR PDF</button>
-            <button class="btn btn-limpar" id="btnLimpar-auto"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+            <button class="btn btn-processar" id="btnProcessar-img" disabled><i class="fa-solid fa-gear"></i> PROCESSAR PDF</button>
+            <button class="btn btn-limpar" id="btnLimpar-img"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
         </div>
     </div>
 
-    <!-- ========== MODO DEMAIS RAMOS ========== -->
-    <div class="modo-panel" id="panel-demais">
+    <!-- ========== MODO INSERIR PDF ========== -->
+    <div class="modo-panel" id="panel-inserir-pdf">
 
         <div class="form-section">
             <div class="header-section">
                 <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Selecionar o PDF Base</div>
+                <div class="header-title">Selecionar o PDF Principal</div>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Arquivo PDF base</label>
-                    <div class="upload-area" id="uploadArea-demais">
+                    <label>Arquivo PDF principal (onde o outro será inserido)</label>
+                    <div class="upload-area" id="uploadArea-pdf">
                         <p><i class="fa-solid fa-file-pdf"></i> <strong>Clique aqui</strong> ou arraste o arquivo PDF</p>
                         <p style="font-size:10px;color:#999;">Formatos: .pdf | Máx: 50MB</p>
-                        <input type="file" id="pdfInput-demais" accept=".pdf">
+                        <input type="file" id="pdfInput-pdf" accept=".pdf">
                     </div>
-                    <div class="file-selected" id="fileSelected-demais">
-                        <strong>Arquivo:</strong> <span id="fileName-demais"></span>
+                    <div class="file-selected" id="fileSelected-pdf">
+                        <strong>Arquivo:</strong> <span id="fileName-pdf"></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="form-section fechado">
+        <div class="form-section">
             <div class="header-section">
                 <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Selecionar a Imagem Base64</div>
+                <div class="header-title">Selecionar o PDF para Inserir</div>
             </div>
             <div class="form-row">
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label>Código Base64 da imagem (PNG ou JPEG)</label>
-                    <textarea id="imagemBase64-demais" placeholder="data:image/png;base64,iVBORw0KGgo..."></textarea>
+                <div class="form-group">
+                    <label>Arquivo PDF para inserir no principal</label>
+                    <div class="upload-area" id="uploadAreaInserir-pdf">
+                        <p><i class="fa-solid fa-file-pdf"></i> <strong>Clique aqui</strong> ou arraste o arquivo PDF</p>
+                        <p style="font-size:10px;color:#999;">Formatos: .pdf | Máx: 50MB</p>
+                        <input type="file" id="pdfInserirInput-pdf" accept=".pdf">
+                    </div>
+                    <div class="file-selected" id="pdfInserirSelected-pdf">
+                        <strong>PDF a inserir:</strong> <span id="pdfInserirName-pdf"></span> (<span id="pdfInserirPages-pdf">0</span> página(s))
+                    </div>
                 </div>
             </div>
         </div>
@@ -634,81 +596,61 @@
         <div class="form-section">
             <div class="header-section">
                 <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Preview da Imagem Base64</div>
-            </div>
-            <div class="preview-box" style="margin:0 20px 20px 20px;">
-                <h4>Pré-visualização da imagem:</h4>
-                <img id="previewImg-demais" class="preview-image" style="display:none;" alt="Imagem">
-                <p id="noPreview-demais" style="text-align:center;color:#999;font-size:11px;padding:15px;">Aguardando código Base64 válido</p>
-            </div>
-        </div>
-
-        <div class="form-section">
-            <div class="header-section">
-                <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Configuração da Página</div>
+                <div class="header-title">Configuração da Inserção</div>
             </div>
             <div class="radio-section">
-                <div class="radio-section-title">Configurações de inserção</div>
+                <div class="radio-section-title">Posição de inserção</div>
                 <div style="margin-bottom:15px;">
-                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Posição da nova página:</label>
+                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Onde inserir o PDF:</label>
                     <div class="radio-columns">
-                        <div class="radio-item"><input type="radio" name="position-demais" id="posInicio-demais" value="start" checked><label for="posInicio-demais">Início do documento</label></div>
-                        <div class="radio-item"><input type="radio" name="position-demais" id="posFinal-demais" value="end"><label for="posFinal-demais">Final do documento</label></div>
-                        <div class="radio-item"><input type="radio" name="position-demais" id="posEspecifica-demais" value="custom"><label for="posEspecifica-demais">Posição específica</label></div>
+                        <div class="radio-item"><input type="radio" name="position-pdf" id="posInicio-pdf" value="start" checked><label for="posInicio-pdf">Início do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-pdf" id="posFinal-pdf" value="end"><label for="posFinal-pdf">Final do documento</label></div>
+                        <div class="radio-item"><input type="radio" name="position-pdf" id="posEspecifica-pdf" value="custom"><label for="posEspecifica-pdf">Depois da página</label></div>
                     </div>
-                    <div id="customPos-demais" style="display:none;margin-top:10px;">
-                        <input type="number" id="pageNum-demais" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
-                    </div>
-                </div>
-                <div>
-                    <label style="font-size:12px;font-weight:bold;display:block;margin-bottom:8px;">Tamanho da página:</label>
-                    <div class="radio-columns">
-                        <div class="radio-item"><input type="radio" name="pageSize-demais" id="sizeA4-demais" value="a4" checked><label for="sizeA4-demais">A4 (210 x 297 mm)</label></div>
-                        <div class="radio-item"><input type="radio" name="pageSize-demais" id="sizeLetter-demais" value="letter"><label for="sizeLetter-demais">Carta (216 x 279 mm)</label></div>
-                        <div class="radio-item"><input type="radio" name="pageSize-demais" id="sizeImg-demais" value="image"><label for="sizeImg-demais">Dimensão da imagem</label></div>
+                    <div id="customPos-pdf" style="display:none;margin-top:10px;">
+                        <input type="number" id="pageNum-pdf" placeholder="Número da página" min="1" style="width:150px;padding:5px;border:1px solid #ccc;font-size:12px;">
+                        <p style="font-size:11px;color:#666;margin-top:4px;">O PDF será inserido DEPOIS desta página</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="alert" id="alert-demais"></div>
-        <div class="loading" id="loading-demais"><i class="fa-solid fa-hourglass"></i> Processando documento... Aguarde.</div>
+        <div class="alert" id="alert-pdf"></div>
+        <div class="loading" id="loading-pdf"><i class="fa-solid fa-hourglass"></i> Processando documento... Aguarde.</div>
 
         <div class="action-buttons">
-            <button class="btn btn-processar" id="btnProcessar-demais" disabled><i class="fa-solid fa-gear"></i> PROCESSAR PDF</button>
-            <button class="btn btn-limpar" id="btnLimpar-demais"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
+            <button class="btn btn-processar" id="btnProcessar-pdf" disabled><i class="fa-solid fa-gear"></i> PROCESSAR PDF</button>
+            <button class="btn btn-limpar" id="btnLimpar-pdf"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
         </div>
     </div>
 
     <!-- ========== MODO LOTE ========== -->
     <div class="modo-panel" id="panel-lote">
 
-        <!-- Seleção de ramo para o lote -->
         <div class="form-section">
             <div class="header-section">
                 <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Imagem a Inserir (por Ramo)</div>
-            </div>
-
-            <div class="lote-tabs-ramo">
-                <div class="lote-tab active" data-lote-ramo="auto">Automóvel</div>
-                <div class="lote-tab" data-lote-ramo="demais">Demais Ramos</div>
-            </div>
-
-            <div class="lote-imagem-preview" id="lote-img-preview-wrap">
-                <img id="lote-preview-img" alt="Preview" style="display:none;">
-                <div class="lote-img-info">
-                    <p id="lote-img-label" style="font-weight:bold; margin-bottom:6px;">Imagem: Automóvel</p>
-                    <p style="color:#999; font-size:11px;">Imagem padrão do ramo selecionado.<br>Para alterar, cole um novo código Base64 abaixo.</p>
-                </div>
+                <div class="header-title">Imagem a Inserir</div>
             </div>
 
             <div class="form-row">
-                <div class="form-group" style="grid-column:1/-1;">
-                    <label>Código Base64 personalizado (opcional)</label>
-                    <textarea id="imagemBase64-lote" placeholder="Deixe em branco para usar a imagem padrão do ramo..."></textarea>
+                <div class="form-group">
+                    <label>Arquivo de imagem (PNG, JPEG, GIF, WEBP)</label>
+                    <div class="upload-area" id="uploadAreaImagem-lote">
+                        <p><i class="fa-solid fa-image"></i> <strong>Clique aqui</strong> ou arraste a imagem</p>
+                        <p style="font-size:10px;color:#999;">PNG, JPEG, GIF, WEBP | Máx: 10MB</p>
+                        <input type="file" id="imagemInput-lote" accept="image/png,image/jpeg,image/gif,image/webp">
+                    </div>
+                    <div class="file-selected" id="imagemSelected-lote">
+                        <strong>Imagem:</strong> <span id="imagemName-lote"></span>
+                    </div>
                 </div>
+            </div>
+
+            <div class="preview-box" style="margin:0 20px 20px 20px;">
+                <h4>Pré-visualização da imagem:</h4>
+                <img id="previewImg-lote" class="preview-image" style="display:none;" alt="Imagem">
+                <p id="noPreview-lote" style="text-align:center;color:#999;font-size:11px;padding:15px;">Aguardando seleção de imagem</p>
             </div>
         </div>
 
@@ -830,75 +772,6 @@
         </div>
     </div>
 
-    <!-- ========== MODO CONVERSOR ========== -->
-    <div class="modo-panel" id="panel-conversor">
-
-        <div class="form-section">
-            <div class="header-section">
-                <i class="fa-solid fa-chevron-down header-icon"></i>
-                <div class="header-title">Converter Imagem para Base64</div>
-            </div>
-
-            <div class="form-group">
-                <label>Selecione uma imagem (PNG, JPEG, GIF, WEBP)</label>
-                <div class="upload-area" id="conv-drop-zone">
-                    <p><i class="fa-solid fa-image"></i> <strong>Clique aqui</strong> ou arraste a imagem</p>
-                    <p style="font-size:10px;color:#999;">PNG, JPEG, GIF, WEBP • Máx: 10MB</p>
-                    <input type="file" id="conv-file-input" accept="image/png,image/jpeg,image/gif,image/webp">
-                </div>
-            </div>
-
-            <!-- Info do arquivo -->
-            <div id="conv-info-wrap" style="display:none; margin: 0 20px 15px 20px; padding:10px 12px; background:#fafafa; border:1px solid #ddd; font-size:12px;">
-                <div style="display:flex; gap:30px; flex-wrap:wrap;">
-                    <div><strong>Nome:</strong> <span id="conv-info-nome">—</span></div>
-                    <div><strong>Tipo:</strong> <span id="conv-info-tipo">—</span></div>
-                    <div><strong>Tamanho original:</strong> <span id="conv-info-tamanho">—</span></div>
-                    <div><strong>Dimensões:</strong> <span id="conv-info-dims">—</span></div>
-                    <div><strong>Base64 (chars):</strong> <span id="conv-info-b64len">—</span></div>
-                </div>
-            </div>
-
-            <!-- Preview -->
-            <div id="conv-preview-wrap" style="display:none; margin: 0 20px 15px 20px;">
-                <div class="preview-box" style="margin:0;">
-                    <h4>Pré-visualização:</h4>
-                    <img id="conv-preview-img" class="preview-image" alt="Preview">
-                </div>
-            </div>
-
-            <!-- Resultado Base64 -->
-            <div id="conv-result-wrap" style="display:none;">
-                <div class="form-group">
-                    <label>Código Base64 gerado:</label>
-                    <textarea id="conv-b64-output" style="min-height:120px;" readonly placeholder="O código Base64 aparecerá aqui..."></textarea>
-                </div>
-
-                <div style="display:flex; gap:10px; margin: 0 20px 20px 20px; flex-wrap:wrap;">
-                    <button class="btn" id="conv-btn-copiar" style="background:#5bc0de;color:white;border-color:#5bc0de;font-weight:bold;">
-                        <i class="fa-solid fa-copy"></i> COPIAR BASE64
-                    </button>
-                    <button class="btn" id="conv-btn-usar-auto" style="background:#4a6675;color:white;border-color:#3d5560;">
-                        <i class="fa-solid fa-car"></i> Usar em Automóvel
-                    </button>
-                    <button class="btn" id="conv-btn-usar-demais" style="background:#4a6675;color:white;border-color:#3d5560;">
-                        <i class="fa-solid fa-file-contract"></i> Usar em Demais Ramos
-                    </button>
-                    <button class="btn" id="conv-btn-usar-lote" style="background:#4a6675;color:white;border-color:#3d5560;">
-                        <i class="fa-solid fa-layer-group"></i> Usar no Lote
-                    </button>
-                </div>
-
-                <div class="alert" id="alert-conv" style="margin:0 20px 15px 20px;"></div>
-            </div>
-
-        </div>
-
-        <div class="action-buttons">
-            <button class="btn btn-limpar" id="conv-btn-limpar"><i class="fa-solid fa-eraser"></i> LIMPAR</button>
-        </div>
-    </div>
-
     <!-- ========== MODO TUTORIAL ========== -->
     <div class="modo-panel" id="panel-tutorial">
         <div class="tutorial-content">
@@ -909,15 +782,15 @@
             </div>
 
             <div class="tutorial-section">
-                <h2><i class="fa-solid fa-car"></i> 1. Automóvel / Demais Ramos</h2>
-                <p>Essas abas permitem inserir uma página de imagem em um PDF existente, com configurações específicas para cada tipo de documento.</p>
+                <h2><i class="fa-solid fa-image"></i> 1. Inserir Imagem</h2>
+                <p>Insira uma página de imagem em um PDF existente, com total controle sobre a posição e tamanho.</p>
                 
                 <h3>Como usar:</h3>
                 <div class="tutorial-step">
                     <strong>Passo 1:</strong> Selecione o arquivo PDF base clicando na área de upload ou arrastando o arquivo.
                 </div>
                 <div class="tutorial-step">
-                    <strong>Passo 2:</strong> Cole o código Base64 da imagem que deseja inserir (ou use a imagem padrão já carregada).
+                    <strong>Passo 2:</strong> Selecione a imagem (PNG, JPEG, GIF ou WEBP) que deseja inserir.
                 </div>
                 <div class="tutorial-step">
                     <strong>Passo 3:</strong> Visualize a imagem na seção de preview para confirmar.
@@ -928,22 +801,41 @@
                 <div class="tutorial-step">
                     <strong>Passo 5:</strong> Clique em "PROCESSAR PDF" e o arquivo será baixado automaticamente.
                 </div>
+            </div>
+
+            <div class="tutorial-section">
+                <h2><i class="fa-solid fa-file-pdf"></i> 2. Inserir PDF</h2>
+                <p>Insira um PDF completo dentro de outro PDF em qualquer posição desejada.</p>
+                
+                <h3>Como usar:</h3>
+                <div class="tutorial-step">
+                    <strong>Passo 1:</strong> Selecione o PDF principal (onde o outro será inserido).
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 2:</strong> Selecione o PDF que deseja inserir.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 3:</strong> Escolha onde inserir: no início, no final ou depois de uma página específica.
+                </div>
+                <div class="tutorial-step">
+                    <strong>Passo 4:</strong> Clique em "PROCESSAR PDF" para criar o documento combinado.
+                </div>
 
                 <div class="tutorial-tip">
-                    <strong><i class="fa-solid fa-lightbulb"></i> Dica:</strong> Use o Conversor para transformar qualquer imagem em código Base64!
+                    <strong><i class="fa-solid fa-lightbulb"></i> Dica:</strong> Use "Depois da página X" para inserir o PDF em uma posição específica do documento!
                 </div>
             </div>
 
             <div class="tutorial-section">
-                <h2><i class="fa-solid fa-layer-group"></i> 2. Processamento em Lote</h2>
+                <h2><i class="fa-solid fa-layer-group"></i> 3. Processamento em Lote</h2>
                 <p>Processe múltiplos PDFs de uma só vez, inserindo a mesma imagem em todos eles.</p>
                 
                 <h3>Como usar:</h3>
                 <div class="tutorial-step">
-                    <strong>Passo 1:</strong> Escolha o ramo (Automóvel ou Demais Ramos) para selecionar a imagem padrão.
+                    <strong>Passo 1:</strong> Selecione a imagem que será inserida em todos os PDFs.
                 </div>
                 <div class="tutorial-step">
-                    <strong>Passo 2:</strong> Configure a posição e tamanho da página (será aplicado a todos os PDFs).
+                    <strong>Passo 2:</strong> Configure a posição e tamanho da página (será aplicado a todos).
                 </div>
                 <div class="tutorial-step">
                     <strong>Passo 3:</strong> Arraste ou selecione múltiplos arquivos PDF.
@@ -961,7 +853,7 @@
             </div>
 
             <div class="tutorial-section">
-                <h2><i class="fa-solid fa-file-zipper"></i> 3. Juntar PDFs</h2>
+                <h2><i class="fa-solid fa-file-zipper"></i> 4. Juntar PDFs</h2>
                 <p>Combine múltiplos arquivos PDF em um único documento.</p>
                 
                 <h3>Como usar:</h3>
@@ -969,7 +861,7 @@
                     <strong>Passo 1:</strong> Selecione os arquivos PDF na ordem desejada.
                 </div>
                 <div class="tutorial-step">
-                    <strong>Passo 2:</strong> Use o botão "Reordenar" se precisar mudar a ordem dos arquivos.
+                    <strong>Passo 2:</strong> Use o botão "Reordenar" ou as setas para mudar a ordem.
                 </div>
                 <div class="tutorial-step">
                     <strong>Passo 3:</strong> Digite o nome para o arquivo final (sem a extensão .pdf).
@@ -977,37 +869,10 @@
                 <div class="tutorial-step">
                     <strong>Passo 4:</strong> Clique em "JUNTAR PDFs" para criar o documento unificado.
                 </div>
-
-                <div class="tutorial-tip">
-                    <strong><i class="fa-solid fa-lightbulb"></i> Dica:</strong> A ordem dos arquivos é importante! Selecione-os na sequência que deseja no documento final.
-                </div>
-            </div>
-
-            <div class="tutorial-section">
-                <h2><i class="fa-solid fa-image"></i> 4. Conversor de Imagem</h2>
-                <p>Converta qualquer imagem (PNG, JPEG, GIF, WEBP) em código Base64 para usar nas outras funcionalidades.</p>
-                
-                <h3>Como usar:</h3>
-                <div class="tutorial-step">
-                    <strong>Passo 1:</strong> Arraste ou selecione uma imagem (máx. 10MB).
-                </div>
-                <div class="tutorial-step">
-                    <strong>Passo 2:</strong> Visualize a imagem e suas informações (tamanho, dimensões, etc).
-                </div>
-                <div class="tutorial-step">
-                    <strong>Passo 3:</strong> Copie o código Base64 gerado ou use os botões rápidos para aplicar diretamente em outras abas.
-                </div>
-
-                <div class="tutorial-highlight">
-                    <strong><i class="fa-solid fa-star"></i> Recurso útil:</strong> Use os botões "Usar em Automóvel", "Usar em Demais Ramos" ou "Usar no Lote" para aplicar a imagem diretamente sem precisar copiar e colar!
-                </div>
             </div>
 
             <div class="tutorial-section">
                 <h2><i class="fa-solid fa-question-circle"></i> Perguntas Frequentes</h2>
-                
-                <h3>O que é Base64?</h3>
-                <p>Base64 é uma forma de codificar imagens em texto. Permite que você armazene e transmita imagens como uma sequência de caracteres.</p>
                 
                 <h3>Qual o tamanho máximo dos arquivos?</h3>
                 <ul>
@@ -1020,6 +885,9 @@
                 
                 <h3>Posso usar em dispositivos móveis?</h3>
                 <p>Sim! O sistema funciona em navegadores modernos de computadores, tablets e smartphones.</p>
+
+                <h3>Como funciona a inserção em posição específica?</h3>
+                <p>Na inserção de imagem, ela é colocada ANTES da página indicada. Na inserção de PDF, ele é colocado DEPOIS da página indicada.</p>
             </div>
 
             <div class="tutorial-section">
@@ -1041,24 +909,9 @@
 const { PDFDocument } = PDFLib;
 
 // =====================================================
-//  IMAGENS PADRÃO
+//  HELPER: processar UM pdf com IMAGEM
 // =====================================================
-const IMAGENS_PADRAO = {
-    auto:   '',
-    demais: ''
-};
-
-// =====================================================
-//  HELPER: validar base64
-// =====================================================
-function ehBase64Valido(texto) {
-    return /^data:image\/(png|jpg|jpeg|gif|webp);base64,/.test(texto);
-}
-
-// =====================================================
-//  HELPER: processar UM pdf
-// =====================================================
-async function processarUmPDF(arrayBuffer, imagemBase64, position, insertIndex_override, pageSize, totalPagesHint) {
+async function processarPDFComImagem(arrayBuffer, imagemBase64, position, insertIndex_override, pageSize) {
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const totalPages = pdfDoc.getPageCount();
 
@@ -1095,6 +948,36 @@ async function processarUmPDF(arrayBuffer, imagemBase64, position, insertIndex_o
 }
 
 // =====================================================
+//  HELPER: inserir PDF dentro de outro PDF
+// =====================================================
+async function inserirPDFemPDF(pdfPrincipalBuffer, pdfInserirBuffer, position, insertPageNum) {
+    const pdfPrincipal = await PDFDocument.load(pdfPrincipalBuffer);
+    const pdfInserir = await PDFDocument.load(pdfInserirBuffer);
+    
+    const totalPagesPrincipal = pdfPrincipal.getPageCount();
+    const pagesInserir = pdfInserir.getPageIndices();
+    
+    let insertIndex;
+    if (position === 'start') {
+        insertIndex = 0;
+    } else if (position === 'end') {
+        insertIndex = totalPagesPrincipal;
+    } else {
+        // Inserir DEPOIS da página especificada
+        insertIndex = Math.max(0, Math.min(insertPageNum, totalPagesPrincipal));
+    }
+    
+    const copiedPages = await pdfPrincipal.copyPages(pdfInserir, pagesInserir);
+    
+    // Inserir páginas na posição correta
+    copiedPages.forEach((page, idx) => {
+        pdfPrincipal.insertPage(insertIndex + idx, page);
+    });
+    
+    return await pdfPrincipal.save();
+}
+
+// =====================================================
 //  HELPER: juntar múltiplos PDFs
 // =====================================================
 async function juntarPDFs(arrayBuffers) {
@@ -1126,6 +1009,26 @@ function downloadPDF(bytes, nomeArquivo) {
 }
 
 // =====================================================
+//  HELPER: converter arquivo para base64
+// =====================================================
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// =====================================================
+//  HELPER: contar páginas de um PDF
+// =====================================================
+async function contarPaginasPDF(arrayBuffer) {
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    return pdfDoc.getPageCount();
+}
+
+// =====================================================
 //  ABAS PRINCIPAIS
 // =====================================================
 document.querySelectorAll('.tab-ramo').forEach(tab => {
@@ -1139,23 +1042,31 @@ document.querySelectorAll('.tab-ramo').forEach(tab => {
 });
 
 // =====================================================
-//  MODO SIMPLES (auto + demais) - fábrica de lógica
+//  MODO INSERIR IMAGEM
 // =====================================================
-function configurarModoSimples(modo) {
-    const uploadArea    = document.getElementById('uploadArea-' + modo);
-    const pdfInput      = document.getElementById('pdfInput-' + modo);
-    const fileSelected  = document.getElementById('fileSelected-' + modo);
-    const fileNameSpan  = document.getElementById('fileName-' + modo);
-    const textarea      = document.getElementById('imagemBase64-' + modo);
-    const previewImg    = document.getElementById('previewImg-' + modo);
-    const noPreview     = document.getElementById('noPreview-' + modo);
-    const btnProcessar  = document.getElementById('btnProcessar-' + modo);
-    const btnLimpar     = document.getElementById('btnLimpar-' + modo);
-    const alertBox      = document.getElementById('alert-' + modo);
-    const loadingBox    = document.getElementById('loading-' + modo);
-    const customPosDiv  = document.getElementById('customPos-' + modo);
-    const pageNumInput  = document.getElementById('pageNum-' + modo);
+(function() {
+    const uploadArea    = document.getElementById('uploadArea-img');
+    const pdfInput      = document.getElementById('pdfInput-img');
+    const fileSelected  = document.getElementById('fileSelected-img');
+    const fileNameSpan  = document.getElementById('fileName-img');
+    
+    const uploadAreaImagem = document.getElementById('uploadAreaImagem-img');
+    const imagemInput   = document.getElementById('imagemInput-img');
+    const imagemSelected = document.getElementById('imagemSelected-img');
+    const imagemNameSpan = document.getElementById('imagemName-img');
+    
+    const previewImg    = document.getElementById('previewImg-img');
+    const noPreview     = document.getElementById('noPreview-img');
+    const btnProcessar  = document.getElementById('btnProcessar-img');
+    const btnLimpar     = document.getElementById('btnLimpar-img');
+    const alertBox      = document.getElementById('alert-img');
+    const loadingBox    = document.getElementById('loading-img');
+    const customPosDiv  = document.getElementById('customPos-img');
+    const pageNumInput  = document.getElementById('pageNum-img');
+    
     let pdfFile = null;
+    let imagemFile = null;
+    let imagemBase64 = null;
 
     function showAlert(msg, type) {
         alertBox.textContent = msg;
@@ -1165,16 +1076,10 @@ function configurarModoSimples(modo) {
     function hideAlert() { alertBox.className = 'alert'; }
 
     function validar() {
-        btnProcessar.disabled = !(pdfFile && ehBase64Valido(textarea.value.trim()));
+        btnProcessar.disabled = !(pdfFile && imagemBase64);
     }
 
-    // Preencher imagem padrão
-    textarea.value = IMAGENS_PADRAO[modo] || IMAGENS_PADRAO['auto'];
-    previewImg.src = textarea.value;
-    previewImg.style.display = 'block';
-    noPreview.style.display = 'none';
-
-    // Upload
+    // Upload PDF
     uploadArea.addEventListener('click', () => pdfInput.click());
     uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('active'); });
     uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('active'));
@@ -1198,22 +1103,45 @@ function configurarModoSimples(modo) {
         }
     });
 
-    // Preview base64
-    textarea.addEventListener('input', () => {
-        const val = textarea.value.trim();
-        if (ehBase64Valido(val)) {
-            previewImg.src = val;
-            previewImg.style.display = 'block';
-            noPreview.style.display = 'none';
-        } else {
-            previewImg.style.display = 'none';
-            noPreview.style.display = 'block';
+    // Upload Imagem
+    uploadAreaImagem.addEventListener('click', () => imagemInput.click());
+    uploadAreaImagem.addEventListener('dragover', e => { e.preventDefault(); uploadAreaImagem.classList.add('active'); });
+    uploadAreaImagem.addEventListener('dragleave', () => uploadAreaImagem.classList.remove('active'));
+    uploadAreaImagem.addEventListener('drop', async e => {
+        e.preventDefault();
+        uploadAreaImagem.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            processarImagem(files[0]);
+        } else { showAlert('Selecione um arquivo de imagem válido.', 'error'); }
+    });
+    imagemInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+            processarImagem(e.target.files[0]);
         }
-        validar();
     });
 
+    async function processarImagem(file) {
+        if (file.size > 10 * 1024 * 1024) {
+            showAlert('Imagem muito grande. Máximo: 10MB', 'error');
+            return;
+        }
+        
+        imagemFile = file;
+        imagemNameSpan.textContent = file.name;
+        imagemSelected.classList.add('show');
+        
+        imagemBase64 = await fileToBase64(file);
+        previewImg.src = imagemBase64;
+        previewImg.style.display = 'block';
+        noPreview.style.display = 'none';
+        
+        validar();
+        hideAlert();
+    }
+
     // Posição específica
-    document.querySelectorAll(`input[name="position-${modo}"]`).forEach(r => {
+    document.querySelectorAll(`input[name="position-img"]`).forEach(r => {
         r.addEventListener('change', e => {
             customPosDiv.style.display = e.target.value === 'custom' ? 'block' : 'none';
         });
@@ -1221,9 +1149,10 @@ function configurarModoSimples(modo) {
 
     // Processar
     btnProcessar.addEventListener('click', async () => {
-        if (!pdfFile) { showAlert('Selecione um arquivo PDF.', 'error'); return; }
-        const imgVal = textarea.value.trim();
-        if (!ehBase64Valido(imgVal)) { showAlert('Código Base64 inválido.', 'error'); return; }
+        if (!pdfFile || !imagemBase64) { 
+            showAlert('Selecione um PDF e uma imagem.', 'error'); 
+            return; 
+        }
 
         try {
             btnProcessar.disabled = true;
@@ -1231,13 +1160,13 @@ function configurarModoSimples(modo) {
             loadingBox.classList.add('show');
             hideAlert();
 
-            const position  = document.querySelector(`input[name="position-${modo}"]:checked`).value;
-            const pageSize  = document.querySelector(`input[name="pageSize-${modo}"]:checked`).value;
+            const position  = document.querySelector(`input[name="position-img"]:checked`).value;
+            const pageSize  = document.querySelector(`input[name="pageSize-img"]:checked`).value;
             let customPage  = parseInt(pageNumInput.value) || 1;
 
             const arrayBuffer = await pdfFile.arrayBuffer();
-            const bytes = await processarUmPDF(arrayBuffer, imgVal, position, customPage, pageSize);
-            downloadPDF(bytes, pdfFile.name.replace('.pdf', '_COMCAPA.pdf'));
+            const bytes = await processarPDFComImagem(arrayBuffer, imagemBase64, position, customPage, pageSize);
+            downloadPDF(bytes, pdfFile.name.replace('.pdf', '_COMIMAGEM.pdf'));
             showAlert('✓ PDF gerado com sucesso! Download iniciado.', 'success');
         } catch (err) {
             showAlert('✗ Erro: ' + err.message, 'error');
@@ -1251,28 +1180,183 @@ function configurarModoSimples(modo) {
     // Limpar
     btnLimpar.addEventListener('click', () => {
         pdfFile = null;
+        imagemFile = null;
+        imagemBase64 = null;
         pdfInput.value = '';
+        imagemInput.value = '';
         fileSelected.classList.remove('show');
-        textarea.value = IMAGENS_PADRAO[modo] || IMAGENS_PADRAO['auto'];
-        previewImg.src = textarea.value;
-        previewImg.style.display = 'block';
-        noPreview.style.display = 'none';
+        imagemSelected.classList.remove('show');
+        previewImg.style.display = 'none';
+        noPreview.style.display = 'block';
         btnProcessar.disabled = true;
-        document.getElementById('posInicio-' + modo).checked = true;
-        document.getElementById('sizeA4-' + modo).checked = true;
+        document.getElementById('posInicio-img').checked = true;
+        document.getElementById('sizeA4-img').checked = true;
         customPosDiv.style.display = 'none';
         pageNumInput.value = '';
         hideAlert();
     });
-}
+})();
 
-configurarModoSimples('auto');
-configurarModoSimples('demais');
+// =====================================================
+//  MODO INSERIR PDF
+// =====================================================
+(function() {
+    const uploadArea    = document.getElementById('uploadArea-pdf');
+    const pdfInput      = document.getElementById('pdfInput-pdf');
+    const fileSelected  = document.getElementById('fileSelected-pdf');
+    const fileNameSpan  = document.getElementById('fileName-pdf');
+    
+    const uploadAreaInserir = document.getElementById('uploadAreaInserir-pdf');
+    const pdfInserirInput   = document.getElementById('pdfInserirInput-pdf');
+    const pdfInserirSelected = document.getElementById('pdfInserirSelected-pdf');
+    const pdfInserirNameSpan = document.getElementById('pdfInserirName-pdf');
+    const pdfInserirPagesSpan = document.getElementById('pdfInserirPages-pdf');
+    
+    const btnProcessar  = document.getElementById('btnProcessar-pdf');
+    const btnLimpar     = document.getElementById('btnLimpar-pdf');
+    const alertBox      = document.getElementById('alert-pdf');
+    const loadingBox    = document.getElementById('loading-pdf');
+    const customPosDiv  = document.getElementById('customPos-pdf');
+    const pageNumInput  = document.getElementById('pageNum-pdf');
+    
+    let pdfPrincipal = null;
+    let pdfInserir = null;
+
+    function showAlert(msg, type) {
+        alertBox.textContent = msg;
+        alertBox.className = `alert ${type} show`;
+    }
+
+    function hideAlert() { alertBox.className = 'alert'; }
+
+    function validar() {
+        btnProcessar.disabled = !(pdfPrincipal && pdfInserir);
+    }
+
+    // Upload PDF Principal
+    uploadArea.addEventListener('click', () => pdfInput.click());
+    uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('active'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('active'));
+    uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type === 'application/pdf') {
+            pdfPrincipal = files[0];
+            fileNameSpan.textContent = files[0].name;
+            fileSelected.classList.add('show');
+            validar(); hideAlert();
+        } else { showAlert('Selecione um arquivo PDF válido.', 'error'); }
+    });
+    pdfInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+            pdfPrincipal = e.target.files[0];
+            fileNameSpan.textContent = pdfPrincipal.name;
+            fileSelected.classList.add('show');
+            validar(); hideAlert();
+        }
+    });
+
+    // Upload PDF para Inserir
+    uploadAreaInserir.addEventListener('click', () => pdfInserirInput.click());
+    uploadAreaInserir.addEventListener('dragover', e => { e.preventDefault(); uploadAreaInserir.classList.add('active'); });
+    uploadAreaInserir.addEventListener('dragleave', () => uploadAreaInserir.classList.remove('active'));
+    uploadAreaInserir.addEventListener('drop', async e => {
+        e.preventDefault();
+        uploadAreaInserir.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type === 'application/pdf') {
+            await processarPDFInserir(files[0]);
+        } else { showAlert('Selecione um arquivo PDF válido.', 'error'); }
+    });
+    pdfInserirInput.addEventListener('change', async e => {
+        if (e.target.files.length > 0) {
+            await processarPDFInserir(e.target.files[0]);
+        }
+    });
+
+    async function processarPDFInserir(file) {
+        try {
+            pdfInserir = file;
+            pdfInserirNameSpan.textContent = file.name;
+            
+            const buffer = await file.arrayBuffer();
+            const numPages = await contarPaginasPDF(buffer);
+            pdfInserirPagesSpan.textContent = numPages;
+            
+            pdfInserirSelected.classList.add('show');
+            validar();
+            hideAlert();
+        } catch(err) {
+            showAlert('Erro ao ler PDF: ' + err.message, 'error');
+        }
+    }
+
+    // Posição específica
+    document.querySelectorAll(`input[name="position-pdf"]`).forEach(r => {
+        r.addEventListener('change', e => {
+            customPosDiv.style.display = e.target.value === 'custom' ? 'block' : 'none';
+        });
+    });
+
+    // Processar
+    btnProcessar.addEventListener('click', async () => {
+        if (!pdfPrincipal || !pdfInserir) { 
+            showAlert('Selecione ambos os PDFs.', 'error'); 
+            return; 
+        }
+
+        try {
+            btnProcessar.disabled = true;
+            btnLimpar.disabled = true;
+            loadingBox.classList.add('show');
+            hideAlert();
+
+            const position  = document.querySelector(`input[name="position-pdf"]:checked`).value;
+            let customPage  = parseInt(pageNumInput.value) || 1;
+
+            const bufferPrincipal = await pdfPrincipal.arrayBuffer();
+            const bufferInserir = await pdfInserir.arrayBuffer();
+            
+            const bytes = await inserirPDFemPDF(bufferPrincipal, bufferInserir, position, customPage);
+            downloadPDF(bytes, pdfPrincipal.name.replace('.pdf', '_COMBINADO.pdf'));
+            showAlert('✓ PDF combinado com sucesso! Download iniciado.', 'success');
+        } catch (err) {
+            showAlert('✗ Erro: ' + err.message, 'error');
+        } finally {
+            btnProcessar.disabled = false;
+            btnLimpar.disabled = false;
+            loadingBox.classList.remove('show');
+        }
+    });
+
+    // Limpar
+    btnLimpar.addEventListener('click', () => {
+        pdfPrincipal = null;
+        pdfInserir = null;
+        pdfInput.value = '';
+        pdfInserirInput.value = '';
+        fileSelected.classList.remove('show');
+        pdfInserirSelected.classList.remove('show');
+        btnProcessar.disabled = true;
+        document.getElementById('posInicio-pdf').checked = true;
+        customPosDiv.style.display = 'none';
+        pageNumInput.value = '';
+        hideAlert();
+    });
+})();
 
 // =====================================================
 //  MODO LOTE
 // =====================================================
 (function() {
+    const uploadAreaImagem = document.getElementById('uploadAreaImagem-lote');
+    const imagemInput   = document.getElementById('imagemInput-lote');
+    const imagemSelected = document.getElementById('imagemSelected-lote');
+    const imagemNameSpan = document.getElementById('imagemName-lote');
+    const previewImg    = document.getElementById('previewImg-lote');
+    const noPreview     = document.getElementById('noPreview-lote');
+    
     const dropZone      = document.getElementById('lote-drop-zone');
     const pdfInput      = document.getElementById('lote-pdf-input');
     const lista         = document.getElementById('lote-lista');
@@ -1284,14 +1368,11 @@ configurarModoSimples('demais');
     const btnBaixar     = document.getElementById('btnBaixarTodos');
     const alertBox      = document.getElementById('alert-lote');
     const loadingBox    = document.getElementById('loading-lote');
-    const textarea      = document.getElementById('imagemBase64-lote');
-    const lotePreview   = document.getElementById('lote-preview-img');
-    const loteLabel     = document.getElementById('lote-img-label');
     const progressWrap  = document.getElementById('lote-progress-wrap');
     const progressFill  = document.getElementById('lote-progress-fill');
 
-    let arquivos = [];          // { file, status, bytes, nome }
-    let ramoLote = 'auto';
+    let arquivos = [];
+    let imagemBase64 = null;
 
     function showAlert(msg, type) {
         alertBox.textContent = msg;
@@ -1299,33 +1380,42 @@ configurarModoSimples('demais');
     }
     function hideAlert() { alertBox.className = 'alert'; }
 
-    // Tabs de ramo do lote
-    document.querySelectorAll('.lote-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.lote-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            ramoLote = tab.dataset.loteRamo;
-            atualizarPreviewLote();
-        });
+    // Upload Imagem
+    uploadAreaImagem.addEventListener('click', () => imagemInput.click());
+    uploadAreaImagem.addEventListener('dragover', e => { e.preventDefault(); uploadAreaImagem.classList.add('active'); });
+    uploadAreaImagem.addEventListener('dragleave', () => uploadAreaImagem.classList.remove('active'));
+    uploadAreaImagem.addEventListener('drop', async e => {
+        e.preventDefault();
+        uploadAreaImagem.classList.remove('active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            processarImagem(files[0]);
+        }
+    });
+    imagemInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) {
+            processarImagem(e.target.files[0]);
+        }
     });
 
-    function getImagemLote() {
-        const custom = textarea.value.trim();
-        if (ehBase64Valido(custom)) return custom;
-        return IMAGENS_PADRAO[ramoLote] || IMAGENS_PADRAO['auto'];
+    async function processarImagem(file) {
+        if (file.size > 10 * 1024 * 1024) {
+            showAlert('Imagem muito grande. Máximo: 10MB', 'error');
+            return;
+        }
+        
+        imagemNameSpan.textContent = file.name;
+        imagemSelected.classList.add('show');
+        
+        imagemBase64 = await fileToBase64(file);
+        previewImg.src = imagemBase64;
+        previewImg.style.display = 'block';
+        noPreview.style.display = 'none';
+        
+        validarLote();
     }
 
-    function atualizarPreviewLote() {
-        const img = getImagemLote();
-        lotePreview.src = img;
-        lotePreview.style.display = 'block';
-        loteLabel.textContent = 'Imagem: ' + (ramoLote === 'auto' ? 'Automóvel' : 'Demais Ramos');
-    }
-
-    textarea.addEventListener('input', atualizarPreviewLote);
-    atualizarPreviewLote();
-
-    // Drag & Drop
+    // Drag & Drop PDFs
     dropZone.addEventListener('click', () => pdfInput.click());
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
@@ -1341,7 +1431,6 @@ configurarModoSimples('demais');
 
     function adicionarArquivos(novos) {
         novos.forEach(f => {
-            // Evitar duplicatas pelo nome
             if (!arquivos.find(a => a.file.name === f.name && a.file.size === f.size)) {
                 arquivos.push({ file: f, status: 'aguardando', bytes: null });
             }
@@ -1355,7 +1444,6 @@ configurarModoSimples('demais');
         arquivos.forEach((item, idx) => {
             const el = document.createElement('div');
             el.className = 'lote-item';
-            el.dataset.idx = idx;
 
             const icone = document.createElement('i');
             icone.className = 'fa-solid fa-file-pdf lote-item-icon';
@@ -1402,7 +1490,7 @@ configurarModoSimples('demais');
     }
 
     function validarLote() {
-        btnProcessar.disabled = arquivos.length === 0;
+        btnProcessar.disabled = !(arquivos.length > 0 && imagemBase64);
     }
 
     function atualizarStatusItem(idx, status) {
@@ -1418,9 +1506,11 @@ configurarModoSimples('demais');
 
     // Processar lote
     btnProcessar.addEventListener('click', async () => {
-        if (arquivos.length === 0) return;
+        if (arquivos.length === 0 || !imagemBase64) {
+            showAlert('Selecione uma imagem e PDFs.', 'error');
+            return;
+        }
 
-        const imgVal    = getImagemLote();
         const position  = document.querySelector('input[name="position-lote"]:checked').value;
         const pageSize  = document.querySelector('input[name="pageSize-lote"]:checked').value;
         const customPage = parseInt(document.getElementById('pageNum-lote').value) || 1;
@@ -1439,9 +1529,9 @@ configurarModoSimples('demais');
             atualizarStatusItem(i, 'processando');
             try {
                 const arrayBuffer = await arquivos[i].file.arrayBuffer();
-                const bytes = await processarUmPDF(arrayBuffer, imgVal, position, customPage, pageSize);
+                const bytes = await processarPDFComImagem(arrayBuffer, imagemBase64, position, customPage, pageSize);
                 arquivos[i].bytes = bytes;
-                arquivos[i].nomeDestino = arquivos[i].file.name.replace('.pdf', '_COMCAPA.pdf');
+                arquivos[i].nomeDestino = arquivos[i].file.name.replace('.pdf', '_COMIMAGEM.pdf');
                 atualizarStatusItem(i, 'ok');
                 okCount++;
             } catch(err) {
@@ -1450,7 +1540,6 @@ configurarModoSimples('demais');
                 console.error('Erro em ' + arquivos[i].file.name, err);
             }
 
-            // Progresso
             const pct = Math.round(((i + 1) / arquivos.length) * 100);
             progressFill.style.width = pct + '%';
         }
@@ -1464,7 +1553,6 @@ configurarModoSimples('demais');
         resumoStatus.textContent = msg;
 
         if (okCount > 0) {
-            // Download automático individual
             arquivos.filter(a => a.status === 'ok').forEach(a => {
                 downloadPDF(a.bytes, a.nomeDestino);
             });
@@ -1482,6 +1570,11 @@ configurarModoSimples('demais');
     // Limpar lote
     btnLimpar.addEventListener('click', () => {
         arquivos = [];
+        imagemBase64 = null;
+        imagemInput.value = '';
+        imagemSelected.classList.remove('show');
+        previewImg.style.display = 'none';
+        noPreview.style.display = 'block';
         renderLista();
         validarLote();
         progressWrap.style.display = 'none';
@@ -1520,7 +1613,7 @@ configurarModoSimples('demais');
     const loadingBox    = document.getElementById('loading-juntar');
     const nomeArquivo   = document.getElementById('juntar-nome-arquivo');
 
-    let arquivos = [];  // { file, ordem }
+    let arquivos = [];
 
     function showAlert(msg, type) {
         alertBox.textContent = msg;
@@ -1678,155 +1771,6 @@ configurarModoSimples('demais');
 
     btnReordenar.addEventListener('click', () => {
         showAlert('Use as setas ↑↓ ao lado de cada arquivo para reordenar.', 'info');
-    });
-
-})();
-
-// =====================================================
-//  MODO CONVERSOR
-// =====================================================
-(function() {
-    const dropZone      = document.getElementById('conv-drop-zone');
-    const fileInput     = document.getElementById('conv-file-input');
-    const infoWrap      = document.getElementById('conv-info-wrap');
-    const previewWrap   = document.getElementById('conv-preview-wrap');
-    const resultWrap    = document.getElementById('conv-result-wrap');
-    const previewImg    = document.getElementById('conv-preview-img');
-    const b64Output     = document.getElementById('conv-b64-output');
-    const alertBox      = document.getElementById('alert-conv');
-
-    const infoNome      = document.getElementById('conv-info-nome');
-    const infoTipo      = document.getElementById('conv-info-tipo');
-    const infoTamanho   = document.getElementById('conv-info-tamanho');
-    const infoDims      = document.getElementById('conv-info-dims');
-    const infoB64len    = document.getElementById('conv-info-b64len');
-
-    function showAlert(msg, type) {
-        alertBox.textContent = msg;
-        alertBox.className = `alert ${type} show`;
-        alertBox.style.display = 'block';
-    }
-    function hideAlert() { alertBox.className = 'alert'; alertBox.style.display = 'none'; }
-
-    function formatBytes(b) {
-        if (b < 1024) return b + ' B';
-        if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
-        return (b/1048576).toFixed(1) + ' MB';
-    }
-
-    function processarImagem(file) {
-        if (!file || !file.type.startsWith('image/')) {
-            showAlert('Selecione um arquivo de imagem válido (PNG, JPEG, GIF, WEBP).', 'error');
-            return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-            showAlert('Arquivo muito grande. Máximo permitido: 10MB.', 'error');
-            return;
-        }
-
-        hideAlert();
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-
-            // Preenche info
-            infoNome.textContent     = file.name;
-            infoTipo.textContent     = file.type;
-            infoTamanho.textContent  = formatBytes(file.size);
-            infoB64len.textContent   = base64.length.toLocaleString('pt-BR') + ' chars';
-
-            // Dimensões via img
-            const tempImg = new Image();
-            tempImg.onload = function() {
-                infoDims.textContent = tempImg.naturalWidth + ' × ' + tempImg.naturalHeight + ' px';
-            };
-            tempImg.src = base64;
-
-            // Preview
-            previewImg.src = base64;
-            previewWrap.style.display = 'block';
-            infoWrap.style.display = 'block';
-
-            // Output
-            b64Output.value = base64;
-            resultWrap.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // Drop zone
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('active'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
-    dropZone.addEventListener('drop', e => {
-        e.preventDefault();
-        dropZone.classList.remove('active');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) processarImagem(files[0]);
-    });
-    fileInput.addEventListener('change', e => {
-        if (e.target.files.length > 0) processarImagem(e.target.files[0]);
-        fileInput.value = '';
-    });
-
-    // Copiar
-    document.getElementById('conv-btn-copiar').addEventListener('click', () => {
-        if (!b64Output.value) return;
-        navigator.clipboard.writeText(b64Output.value).then(() => {
-            showAlert('✓ Código Base64 copiado para a área de transferência!', 'success');
-        }).catch(() => {
-            b64Output.select();
-            document.execCommand('copy');
-            showAlert('✓ Código Base64 copiado!', 'success');
-        });
-    });
-
-    // Usar em Automóvel
-    document.getElementById('conv-btn-usar-auto').addEventListener('click', () => {
-        if (!b64Output.value) return;
-        document.getElementById('imagemBase64-auto').value = b64Output.value;
-        document.getElementById('imagemBase64-auto').dispatchEvent(new Event('input'));
-        // Troca para aba auto
-        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
-        document.querySelector('[data-modo="auto"]').classList.add('active');
-        document.getElementById('panel-auto').classList.add('active');
-        showAlert('✓ Imagem aplicada na aba Automóvel!', 'success');
-    });
-
-    // Usar em Demais Ramos
-    document.getElementById('conv-btn-usar-demais').addEventListener('click', () => {
-        if (!b64Output.value) return;
-        document.getElementById('imagemBase64-demais').value = b64Output.value;
-        document.getElementById('imagemBase64-demais').dispatchEvent(new Event('input'));
-        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
-        document.querySelector('[data-modo="demais"]').classList.add('active');
-        document.getElementById('panel-demais').classList.add('active');
-        showAlert('✓ Imagem aplicada na aba Demais Ramos!', 'success');
-    });
-
-    // Usar no Lote
-    document.getElementById('conv-btn-usar-lote').addEventListener('click', () => {
-        if (!b64Output.value) return;
-        document.getElementById('imagemBase64-lote').value = b64Output.value;
-        document.getElementById('imagemBase64-lote').dispatchEvent(new Event('input'));
-        document.querySelectorAll('.tab-ramo').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.modo-panel').forEach(p => p.classList.remove('active'));
-        document.querySelector('[data-modo="lote"]').classList.add('active');
-        document.getElementById('panel-lote').classList.add('active');
-        showAlert('✓ Imagem aplicada na aba Em Lote!', 'success');
-    });
-
-    // Limpar
-    document.getElementById('conv-btn-limpar').addEventListener('click', () => {
-        fileInput.value = '';
-        b64Output.value = '';
-        previewImg.src = '';
-        infoWrap.style.display = 'none';
-        previewWrap.style.display = 'none';
-        resultWrap.style.display = 'none';
-        hideAlert();
     });
 
 })();
